@@ -1,0 +1,191 @@
+.legend {
+  position: absolute;
+  z-index: 500;
+  left: 16px;
+  bottom: 22px;
+  display: flex;
+  align-items: center;
+  gap: 19px;
+  padding: 11px 14px;
+  border: 1px solid rgba(130, 145, 175, .2);
+  border-radius: 28px;
+  background: rgba(3, 6, 15, .94);
+  box-shadow: 0 6px 18px #0004;
+}
+
+.legend span {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.legend-dot {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.green {
+  background: #00dca4;
+  box-shadow: 0 0 12px #00dca466;
+}
+
+.yellow {
+  background: #ffcb32;
+  box-shadow: 0 0 12px #ffcb3266;
+}
+
+.red {
+  background: #ff484e;
+  box-shadow: 0 0 12px #ff484e66;
+}
+
+.map-controls {
+  position: absolute;
+  z-index: 500;
+  right: 22px;
+  bottom: 99px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.map-controls button {
+  width: 44px;
+  height: 44px;
+  border: 1px solid rgba(124, 141, 172, .18);
+  background: rgba(3, 6, 15, .92);
+  border-radius: 14px;
+  font-size: 27px;
+  display: grid;
+  place-items: center;
+}
+
+.map-controls button:hover {
+  border-color: #a700ff;
+  background: #101022;
+}
+
+.map-controls svg {
+  width: 23px;
+  height: 23px;
+  fill: none;
+  stroke: #e4e8f4;
+  stroke-width: 2;
+}
+
+.zoom-controls {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid rgba(124, 141, 172, .18);
+  border-radius: 19px;
+  overflow: hidden;
+  background: rgba(3, 6, 15, .92);
+}
+
+.zoom-controls button {
+  border: 0;
+  border-radius: 0;
+  height: 46px;
+}
+
+.zoom-controls button+button {
+  border-top: 1px solid rgba(124, 141, 172, .13);
+}
+
+.my-location {
+  position: absolute;
+  z-index: 500;
+  right: 22px;
+  bottom: 22px;
+  border: 1px solid #6d0ab4;
+  border-radius: 30px;
+  background: rgba(41, 6, 76, .94);
+  padding: 11px 16px;
+  font-size: 14px;
+  box-shadow: 0 0 20px #8a00ff30;
+}
+
+.my-location span {
+  font-size: 22px;
+  margin-right: 8px;
+}
+
+.toast {
+  position: absolute;
+  z-index: 900;
+  top: 20px;
+  left: 50%;
+  transform: translate(-50%, -12px);
+  opacity: 0;
+  pointer-events: none;
+  border: 1px solid #7924ba;
+  border-radius: 12px;
+  background: #100b20;
+  padding: 12px 18px;
+  color: #f3e8ff;
+  box-shadow: 0 8px 28px #0007;
+  transition: .2s;
+  max-width: 80vw;
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+.marker-pin {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: start center;
+  padding-top: 7px;
+  filter: drop-shadow(0 0 8px var(--marker));
+  transition: transform .16s ease;
+}
+
+.marker-pin::before {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 7px;
+  width: 34px;
+  height: 34px;
+  border: 2.5px solid var(--marker);
+  border-radius: 50% 50% 50% 8%;
+  transform: rotate(-45deg);
+  background: color-mix(in srgb, var(--marker) 15%, #050a16);
+}
+
+.marker-pin::after {
+  content: "";
+  position: absolute;
+  top: 32px;
+  left: 20px;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 11px solid var(--marker);
+}
+
+.marker-pin svg {
+  z-index: 1;
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: #f5f7ff;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.map-marker:hover .marker-pin,
+.map-marker.selected .marker-pin {
+  transform: scale(1.17);
+}
+
+.map-marker.selected .marker-pin::before {
+  box-shadow: 0 0 0 4px #d1d5db35, 0 0 22px #d1d5db;
+}

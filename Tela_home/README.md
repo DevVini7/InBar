@@ -7,7 +7,10 @@ Projeto front-end em HTML, CSS e JavaScript. O mapa usa Leaflet e tiles cartogr�
 - `js/map.js`: criação do mapa, marcadores, navegação e geolocalização.
 - `js/place-card.js`: conteúdo e expansão do cartão de detalhes na HOME.
 - `js/app.js`: filtros, busca e eventos da interface.
-- `css/style.css`: estilos da tela e dos componentes.
+- `css/style.css`: estilos globais, cabeçalho, mapa e filtros.
+- `css/place-card.css`: cartão compacto e expandido dos locais.
+- `css/map-controls.css`: legenda, controles do mapa, notificações e marcadores.
+- `css/responsive.css`: ajustes para tablets e celulares.
 
 ## Como executar
 1. Extraia o ZIP para uma pasta.
