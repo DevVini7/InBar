@@ -99,19 +99,22 @@
 .my-location {
   position: absolute;
   z-index: 500;
+  display: inline-flex;
+  align-items: center;
   right: 22px;
   bottom: 22px;
   border: 1px solid #6d0ab4;
   border-radius: 30px;
   background: rgba(41, 6, 76, .94);
   padding: 11px 16px;
+  gap: 8px;
   font-size: 14px;
   box-shadow: 0 0 20px #8a00ff30;
 }
 
-.my-location span {
-  font-size: 22px;
-  margin-right: 8px;
+.my-location .icon {
+  width: 18px;
+  height: 18px;
 }
 
 .toast {

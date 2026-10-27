@@ -7,6 +7,8 @@ Projeto front-end em HTML, CSS e JavaScript. O mapa usa Leaflet e tiles cartogr�
 - `js/map.js`: criação do mapa, marcadores, navegação e geolocalização.
 - `js/place-card.js`: conteúdo e expansão do cartão de detalhes na HOME.
 - `js/app.js`: filtros, busca e eventos da interface.
+- `assets/icons.svg`: coleção local de ícones SVG Lucide, reutilizada pela HOME sem API ou CDN.
+- `assets/LICENSE`: avisos de licença dos ícones.
 - `css/style.css`: estilos globais, cabeçalho, mapa e filtros.
 - `css/place-card.css`: cartão compacto e expandido dos locais.
 - `css/map-controls.css`: legenda, controles do mapa, notificações e marcadores.
@@ -25,6 +27,11 @@ Projeto front-end em HTML, CSS e JavaScript. O mapa usa Leaflet e tiles cartogr�
 - Filtros por categoria e busca por nome/bairro.
 - Geolocalização do navegador (requer permissão; em geral funciona em localhost ou HTTPS) posicionada sobre o mapa real.
 - Layout adaptável para desktop e celular.
+
+## Como reutilizar os ícones
+- Use um símbolo existente de `assets/icons.svg` com `<svg class="icon" aria-hidden="true"><use href="assets/icons.svg#nome-do-icone"></use></svg>`.
+- Para conteúdo criado por JavaScript, crie o elemento SVG e o `<use>` com `document.createElementNS`, seguindo o exemplo em `js/place-card.js`.
+- Os ícones ficam no projeto: não adicione dependências de ícones por API ou CDN. Ao incluir ícones Lucide, atualize os símbolos e os avisos de licença em `assets/LICENSE`.
 
 ## Observações
 - Os bares, eventos, avaliações, ofertas, números de ocupação, fotos, perfis e publicações são dados fictícios de demonstração. Os pontos foram colocados em quadras comerciais indicadas no OpenStreetMap (CLN, CLS e Setor Comercial Sul); não representam endereços confirmados dos estabelecimentos fictícios.

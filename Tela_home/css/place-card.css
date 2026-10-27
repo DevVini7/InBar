@@ -89,11 +89,9 @@
   white-space: nowrap;
 }
 
-.stat>span:first-child {
+.stat>.icon {
   color: #d4e5f9;
-  font-size: 18px;
   width: 20px;
-  text-align: center;
 }
 
 .stat b {
@@ -200,9 +198,11 @@
   font-size: 12px;
 }
 
-.rating>span:first-child {
+.rating-icon {
+  width: 16px;
+  height: 16px;
+  fill: currentColor;
   color: #ffd344;
-  font-size: 16px;
 }
 
 .rating strong {
@@ -257,9 +257,18 @@
 }
 
 .feature-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 20px;
+  width: 20px;
+  height: 20px;
   color: #e02bff;
-  font-size: 16px;
-  line-height: 1;
+}
+
+.feature-icon .icon {
+  width: 18px;
+  height: 18px;
 }
 
 .feature-chip small {
@@ -276,8 +285,10 @@
 }
 
 .promotion-icon {
+  width: 22px;
+  height: 22px;
+  flex: 0 0 22px;
   color: #d52cff;
-  font-size: 22px;
 }
 
 .promotion strong,
@@ -323,11 +334,19 @@
 }
 
 .text-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
   padding: 4px 0;
   border: 0;
   background: transparent;
   color: #d02aff;
   font-size: 10px;
+}
+
+.text-button .icon {
+  width: 14px;
+  height: 14px;
 }
 
 .post-list {
@@ -425,6 +444,11 @@
   text-decoration: none;
 }
 
+.detail-actions .icon {
+  width: 16px;
+  height: 16px;
+}
+
 .directions-button {
   border-color: #29233c;
   background: #0d0e1c;
@@ -436,10 +460,6 @@
   filter: brightness(1.16);
 }
 
-.detail-actions span {
-  font-size: 15px;
-}
-
 .card-arrow {
   position: absolute;
   right: 48px;
@@ -449,8 +469,13 @@
   border-radius: 50%;
   width: 30px;
   height: 30px;
-  font-size: 26px;
-  line-height: 22px;
+  display: grid;
+  place-items: center;
+}
+
+.card-arrow .icon {
+  width: 19px;
+  height: 19px;
 }
 
 .card-close {
@@ -463,5 +488,11 @@
   border-radius: 50%;
   width: 29px;
   height: 29px;
-  font-size: 20px;
+  display: grid;
+  place-items: center;
+}
+
+.card-close .icon {
+  width: 16px;
+  height: 16px;
 }

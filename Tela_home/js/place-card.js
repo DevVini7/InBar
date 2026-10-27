@@ -5,6 +5,17 @@ window.InbarPlaceCard = (() => {
   const postList = document.getElementById("postList");
   let expanded = false;
 
+  function createIcon(name) {
+    const icon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    const use = document.createElementNS("http://www.w3.org/2000/svg", "use");
+    icon.classList.add("icon");
+    icon.setAttribute("aria-hidden", "true");
+    icon.setAttribute("focusable", "false");
+    use.setAttribute("href", `assets/icons.svg#${name}`);
+    icon.append(use);
+    return icon;
+  }
+
   function render(place, onMessage) {
     document.getElementById("placeName").textContent = place.name;
     document.getElementById("placeScore").textContent = place.rating;
@@ -65,10 +76,10 @@ window.InbarPlaceCard = (() => {
 
   function renderFeatures(place) {
     const icons = {
-      "Música ao vivo": "♫",
-      "Happy Hour": "🍸",
-      "Eventos": "✦",
-      "Outros": "◇"
+      "Música ao vivo": "music-2",
+      "Happy Hour": "martini",
+      "Eventos": "calendar-days",
+      "Outros": "ellipsis"
     };
     featureList.replaceChildren();
     place.types.filter(type => type !== "Bares").slice(0, 2).forEach(type => {
@@ -76,8 +87,7 @@ window.InbarPlaceCard = (() => {
       feature.className = "feature-chip";
       const icon = document.createElement("span");
       icon.className = "feature-icon";
-      icon.setAttribute("aria-hidden", "true");
-      icon.textContent = icons[type] || "◇";
+      icon.append(createIcon(icons[type] || "map"));
       const text = document.createElement("span");
       text.append(document.createTextNode(type));
       const time = document.createElement("small");

@@ -108,11 +108,23 @@ button {
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .015);
 }
 
+.icon {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  flex: 0 0 auto;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vertical-align: middle;
+}
+
 .search-icon {
-  font-size: 31px;
+  width: 18px;
+  height: 18px;
   color: #a8b4cc;
-  transform: rotate(-20deg);
-  line-height: 1;
 }
 
 .search input {
@@ -133,7 +145,9 @@ button {
   border: 0;
   background: transparent;
   color: #aab3c7;
-  font-size: 23px;
+  width: 24px;
+  height: 24px;
+  padding: 3px;
   display: none;
 }
 
@@ -153,10 +167,8 @@ button {
 .avatar-button svg {
   width: 100%;
   height: 100%;
-  fill: #e7edf8;
+  fill: none;
   stroke: #e7edf8;
-  stroke-width: 1.6;
-  stroke-linecap: round;
 }
 
 .map-shell {
@@ -264,31 +276,17 @@ button {
 }
 
 .filter-icon {
-  width: 18px;
-  text-align: center;
-  font-size: 18px;
-  line-height: 1;
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  flex: 0 0 20px;
   color: #e6e9f7;
 }
 
-.filter-icon svg {
-  display: block;
-  width: 100%;
-  height: 100%;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 1.8;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-
-.filter-icon .icon-dot {
-  fill: currentColor;
-}
-
-.filter[data-filter="Música ao vivo"] {
-  padding-left: 9px;
-  gap: 7px;
+.filter-icon .icon {
+  width: 19px;
+  height: 19px;
 }
 
 .hidden,
