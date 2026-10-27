@@ -1,15 +1,4 @@
-const places = [
-  { id:1, name:"Villa Lounge", category:"Bares", types:["Bares","Eventos","Música ao vivo"], lat:-15.80920, lng:-47.88529, distance:"CLS 402/403 • Asa Sul", status:"Movimentado agora", level:"yellow", occupancy:70, posts:12, image:"https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=360&h=420&fit=crop", desc:"Música, drinks e pista animada." },
-  { id:2, name:"Bar Esquina 21", category:"Bares", types:["Bares","Happy Hour"], lat:-15.75767, lng:-47.88299, distance:"CLN 209 • Asa Norte", status:"Tranquilo agora", level:"green", occupancy:32, posts:5, image:"https://images.unsplash.com/photo-1514933651103-005eec06c04b?w=360&h=420&fit=crop", desc:"Drinks autorais e happy hour." },
-  { id:3, name:"Subsolo Club", category:"Eventos", types:["Bares","Eventos","Música ao vivo"], lat:-15.76328, lng:-47.89017, distance:"CLN 308 • Asa Norte", status:"Lotado agora", level:"red", occupancy:94, posts:28, image:"https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=360&h=420&fit=crop", desc:"DJ ao vivo e pista até tarde." },
-  { id:4, name:"Boteco do Lago", category:"Bares", types:["Bares","Happy Hour"], lat:-15.78007, lng:-47.87487, distance:"CLN 402 • Asa Norte", status:"Movimentado agora", level:"yellow", occupancy:68, posts:9, image:"https://images.unsplash.com/photo-1514933651103-005eec06c04b?w=360&h=420&fit=crop", desc:"Petiscos e happy hour na Asa Norte." },
-  { id:5, name:"Quintal 61", category:"Happy Hour", types:["Bares","Happy Hour"], lat:-15.81913, lng:-47.89525, distance:"CLS 404/405 • Asa Sul", status:"Tranquilo agora", level:"green", occupancy:28, posts:4, image:"https://images.unsplash.com/photo-1514933651103-005eec06c04b?w=360&h=420&fit=crop", desc:"Um espaço descontraído para encontrar amigos." },
-  { id:6, name:"Festival Central", category:"Eventos", types:["Eventos","Música ao vivo"], lat:-15.81430, lng:-47.88991, distance:"CLS 404/405 • Asa Sul", status:"Lotado agora", level:"red", occupancy:97, posts:34, image:"https://images.unsplash.com/photo-1501386761578-eac5c94b800a?w=360&h=420&fit=crop", desc:"Festival com shows e experiências." },
-  { id:7, name:"Terraço 404", category:"Bares", types:["Bares","Happy Hour"], lat:-15.77330, lng:-47.87552, distance:"CLN 404 • Asa Norte", status:"Movimentado agora", level:"yellow", occupancy:75, posts:16, image:"https://images.unsplash.com/photo-1514933651103-005eec06c04b?w=360&h=420&fit=crop", desc:"Drinks e vista panorâmica." },
-  { id:8, name:"Samba da Praça", category:"Música ao vivo", types:["Eventos","Música ao vivo"], lat:-15.81424, lng:-47.90734, distance:"CLS 308 • Asa Sul", status:"Tranquilo agora", level:"green", occupancy:40, posts:7, image:"https://images.unsplash.com/photo-1501386761578-eac5c94b800a?w=360&h=420&fit=crop", desc:"Samba ao vivo em ambiente aberto." },
-  { id:9, name:"Neblina Bar", category:"Bares", types:["Bares","Happy Hour"], lat:-15.76335, lng:-47.88091, distance:"CLN 208 • Asa Norte", status:"Tranquilo agora", level:"green", occupancy:35, posts:6, image:"https://images.unsplash.com/photo-1514933651103-005eec06c04b?w=360&h=420&fit=crop", desc:"Coquetelaria e ambiente intimista." },
-  { id:10, name:"Noite Alta", category:"Bares", types:["Bares","Eventos","Música ao vivo"], lat:-15.79710, lng:-47.88949, distance:"Setor Comercial Sul", status:"Lotado agora", level:"red", occupancy:91, posts:21, image:"https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=360&h=420&fit=crop", desc:"Uma noite cheia de energia." }
-];
+const places = window.inbarPlaces;
 
 const colors = { green:"#00e7b0", yellow:"#ffcf35", red:"#ff4d52", purple:"#d1d5db" };
 const map = document.getElementById("map");
@@ -92,8 +81,11 @@ function renderMarkers() {
 function selectPlace(id, pan=false) {
   const place = places.find(p => p.id === id);
   if (!place) return;
+  if (selectedId !== id) collapsePlaceDetails();
   selectedId = id;
   document.getElementById("placeName").textContent = place.name;
+  document.getElementById("placeScore").textContent = place.rating;
+  document.getElementById("placeReviews").textContent = `(${place.reviews} avaliações)`;
   document.getElementById("placeDistance").textContent = place.distance;
   document.getElementById("placeStatus").textContent = place.status;
   document.getElementById("placeOccupancy").textContent = `${place.occupancy}%`;
@@ -102,9 +94,104 @@ function selectPlace(id, pan=false) {
   document.getElementById("placeImage").alt = `Ambiente de ${place.name}`;
   document.getElementById("statusDot").style.borderColor = colors[place.level];
   document.getElementById("placeStatus").style.color = colors[place.level];
+  renderPlaceDetails(place);
   document.getElementById("placeCard").classList.remove("hidden");
   renderMarkers();
   if (pan) panTo(place);
+}
+function collapsePlaceDetails() {
+  const card = document.getElementById("placeCard");
+  card.classList.remove("expanded");
+  document.getElementById("expandedDetails").classList.add("hidden");
+  document.getElementById("detailHighlights").classList.add("hidden");
+  document.getElementById("detailGallery").classList.add("hidden");
+  document.getElementById("placeRating").classList.add("hidden");
+  document.getElementById("detailsButton").textContent = "Ver detalhes";
+  document.getElementById("detailsButton").setAttribute("aria-expanded","false");
+}
+function renderPlaceDetails(place) {
+  const photos = [
+    place.image.replace("w=900&h=560","w=900&h=600"),
+    "https://images.unsplash.com/photo-1501386761578-eac5c94b800a?w=900&h=600&fit=crop",
+    "https://images.unsplash.com/photo-1514933651103-005eec06c04b?w=900&h=600&fit=crop"
+  ];
+  const gallery = document.getElementById("detailGallery");
+  gallery.replaceChildren();
+  photos.forEach((source,index) => {
+    const button = document.createElement("button");
+    button.className = `gallery-thumb${index === 0 ? " active" : ""}`;
+    button.type = "button";
+    button.setAttribute("aria-label",`Mostrar foto ${index + 1}`);
+    const image = document.createElement("img");
+    image.src = source.replace("w=900&h=600","w=120&h=100");
+    image.alt = "";
+    button.append(image);
+    button.addEventListener("click",() => {
+      document.getElementById("placeImage").src = source;
+      gallery.querySelectorAll(".gallery-thumb").forEach(thumb => thumb.classList.remove("active"));
+      button.classList.add("active");
+    });
+    gallery.append(button);
+  });
+  const morePhotos = document.createElement("button");
+  morePhotos.className = "gallery-thumb gallery-more";
+  morePhotos.type = "button";
+  morePhotos.textContent = "+8 fotos";
+  morePhotos.addEventListener("click",() => showToast("Galeria de fotos demonstrativa."));
+  gallery.append(morePhotos);
+
+  const icons = {"Música ao vivo":"♫","Happy Hour":"🍸","Eventos":"✦","Outros":"◇"};
+  const featureList = document.getElementById("featureList");
+  featureList.replaceChildren();
+  place.types.filter(type => type !== "Bares").slice(0,2).forEach(type => {
+    const feature = document.createElement("div");
+    feature.className = "feature-chip";
+    const icon = document.createElement("span");
+    icon.className = "feature-icon";
+    icon.setAttribute("aria-hidden","true");
+    icon.textContent = icons[type] || "◇";
+    const text = document.createElement("span");
+    text.append(document.createTextNode(type));
+    const time = document.createElement("small");
+    time.textContent = "Hoje à noite";
+    text.append(time);
+    feature.append(icon,text);
+    featureList.append(feature);
+  });
+  document.getElementById("promotionText").textContent = "Condições demonstrativas";
+
+  const posts = [
+    {user:"joaosilva",time:"há 12 min",text:`${place.status.replace(" agora","")} por aqui! 🔥`,image:photos[0]},
+    {user:"mariana.r",time:"há 28 min",text:"Happy hour imperdível! 🍹",image:photos[2]},
+    {user:"villaficial",time:"há 1 h",text:`${place.desc} 🎶`,image:photos[1]}
+  ];
+  const postList = document.getElementById("postList");
+  postList.replaceChildren();
+  posts.forEach(post => {
+    const card = document.createElement("article");
+    card.className = "post-card";
+    const author = document.createElement("div");
+    author.className = "post-author";
+    const avatar = document.createElement("span");
+    avatar.className = "author-avatar";
+    avatar.textContent = post.user.slice(0,1).toUpperCase();
+    const authorInfo = document.createElement("span");
+    authorInfo.className = "author-info";
+    authorInfo.append(document.createTextNode(post.user));
+    const time = document.createElement("small");
+    time.textContent = post.time;
+    authorInfo.append(time);
+    author.append(avatar,authorInfo);
+    const image = document.createElement("img");
+    image.className = "post-image";
+    image.src = post.image.replace("w=900&h=600","w=360&h=180");
+    image.alt = `Publicação demonstrativa de ${post.user}`;
+    const caption = document.createElement("p");
+    caption.textContent = post.text;
+    card.append(author,image,caption);
+    postList.append(card);
+  });
+  document.getElementById("directionsLink").href = `https://www.openstreetmap.org/directions?to=${place.lat}%2C${place.lng}`;
 }
 function showToast(message) {
   const toast = document.getElementById("toast");
@@ -122,6 +209,7 @@ document.querySelectorAll(".filter").forEach(button => {
     const visiblePlaces = getVisiblePlaces();
     if (!visiblePlaces.some(place => place.id === selectedId)) {
       selectedId = null;
+      collapsePlaceDetails();
       document.getElementById("placeCard").classList.add("hidden");
     }
     renderMarkers();
@@ -137,6 +225,7 @@ document.getElementById("searchForm").addEventListener("submit", event => {
   if (firstVisible) {
     if (selectedId !== null && !getVisiblePlaces().some(place => place.id === selectedId)) {
       selectedId = null;
+      collapsePlaceDetails();
       document.getElementById("placeCard").classList.add("hidden");
     }
     renderMarkers();
@@ -144,6 +233,7 @@ document.getElementById("searchForm").addEventListener("submit", event => {
   } else {
     selectedId = null;
     renderMarkers();
+    collapsePlaceDetails();
     document.getElementById("placeCard").classList.add("hidden");
     showToast(q ? `Nenhum resultado para “${q}”.` : "Digite um lugar ou bairro para buscar.");
   }
@@ -154,6 +244,7 @@ document.getElementById("searchInput").addEventListener("input", () => {
   const firstVisible = getVisiblePlaces()[0];
   if (!firstVisible || !getVisiblePlaces().some(place => place.id === selectedId)) {
     selectedId = null;
+    collapsePlaceDetails();
     document.getElementById("placeCard").classList.add("hidden");
   }
   renderMarkers();
@@ -211,9 +302,20 @@ document.getElementById("closeCard").addEventListener("click", () => {
   selectedId = null;
   renderMarkers();
 });
-document.getElementById("detailsButton").addEventListener("click", () => {
-  const place = places.find(p => p.id === selectedId);
-  showToast(`${place.name} — ${place.desc}`);
+document.getElementById("detailsButton").addEventListener("click", event => {
+  const expanded = !document.getElementById("placeCard").classList.contains("expanded");
+  document.getElementById("placeCard").classList.toggle("expanded",expanded);
+  document.getElementById("expandedDetails").classList.toggle("hidden",!expanded);
+  document.getElementById("detailHighlights").classList.toggle("hidden",!expanded);
+  document.getElementById("detailGallery").classList.toggle("hidden",!expanded);
+  document.getElementById("placeRating").classList.toggle("hidden",!expanded);
+  event.currentTarget.textContent = expanded ? "Ver menos" : "Ver detalhes";
+  event.currentTarget.setAttribute("aria-expanded",String(expanded));
+});
+document.getElementById("allPosts").addEventListener("click",() => showToast("Feed de publicações demonstrativo."));
+document.getElementById("feedButton").addEventListener("click",() => {
+  const place = places.find(item => item.id === selectedId);
+  if (place) showToast(`Feed de ${place.name} — demonstração.`);
 });
 document.querySelectorAll(".nav-link").forEach(button => {
   button.addEventListener("click", () => {

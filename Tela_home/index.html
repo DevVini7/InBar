@@ -66,14 +66,38 @@
     <section class="place-card hidden" id="placeCard" aria-live="polite">
       <button class="card-arrow" id="nextPlace" aria-label="Próximo lugar">›</button>
       <button class="card-close" id="closeCard" aria-label="Fechar detalhes">×</button>
-      <img class="place-image" id="placeImage" src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=360&h=420&fit=crop" alt="Ambiente do estabelecimento">
+      <div class="place-gallery">
+        <img class="place-image" id="placeImage" src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=360&h=420&fit=crop" alt="Ambiente do estabelecimento">
+        <div class="detail-gallery hidden" id="detailGallery" aria-label="Fotos do local"></div>
+      </div>
       <div class="place-info">
         <h2 id="placeName">Villa Lounge</h2>
+        <p class="rating hidden" id="placeRating"><span aria-hidden="true">★</span> <strong id="placeScore"></strong> <span id="placeReviews"></span></p>
         <p class="distance" id="placeDistance">1,8 km • Asa Sul</p>
         <p class="status"><span class="status-dot" id="statusDot"></span><strong id="placeStatus">Movimentado agora</strong></p>
         <p class="stat"><span>♟</span><span><b id="placeOccupancy">70%</b> de ocupação</span></p>
         <p class="stat"><span>▧</span><span><b id="placePosts">12</b> publicações recentes</span></p>
-        <button class="details-button" id="detailsButton">Ver detalhes</button>
+        <div class="detail-highlights hidden" id="detailHighlights">
+          <div class="feature-list" id="featureList" aria-label="Destaques do local"></div>
+          <div class="promotion">
+            <span class="promotion-icon" aria-hidden="true">◇</span>
+            <div><strong>Oferta especial</strong><small id="promotionText"></small></div>
+          </div>
+        </div>
+        <button class="details-button" id="detailsButton" aria-expanded="false" aria-controls="expandedDetails">Ver detalhes</button>
+      </div>
+      <div class="expanded-details hidden" id="expandedDetails">
+        <section class="recent-posts" aria-labelledby="postsTitle">
+          <div class="section-heading">
+            <h3 id="postsTitle">Publicações recentes</h3>
+            <button class="text-button" id="allPosts">Ver todas <span aria-hidden="true">→</span></button>
+          </div>
+          <div class="post-list" id="postList"></div>
+        </section>
+        <div class="detail-actions">
+          <button class="feed-button" id="feedButton"><span aria-hidden="true">➤</span> Ver feed do local</button>
+          <a class="directions-button" id="directionsLink" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">♧</span> Como chegar</a>
+        </div>
       </div>
     </section>
 
@@ -94,6 +118,7 @@
     <div class="toast" id="toast" role="status"></div>
   </main>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script src="js/places.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>

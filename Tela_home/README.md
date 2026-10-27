@@ -11,11 +11,12 @@ Projeto front-end em HTML, CSS e JavaScript. O mapa usa Leaflet e tiles cartogr�
 ## Recursos implementados
 - Mapa cartográfico real e interativo, centrado no Plano Piloto e enquadrado para mostrar as Asas Norte e Sul, com tratamento escuro em tons de cinza inspirado em mapas de navegação. Arraste para navegar e use a roda do mouse ou os botões +/− para aproximar.
 - Marcadores clicáveis com cores de status. Os detalhes do lugar só aparecem ao selecionar um marcador.
+- O cartão do local pode ser expandido na própria tela HOME para mostrar fotos, status, destaques e publicações demonstrativas; use "Como chegar" para abrir a rota no OpenStreetMap.
 - Filtros por categoria e busca por nome/bairro.
 - Geolocalização do navegador (requer permissão; em geral funciona em localhost ou HTTPS) posicionada sobre o mapa real.
 - Layout adaptável para desktop e celular.
 
 ## Observações
-- Os bares, eventos, números de ocupação e publicações são dados fictícios de demonstração. Os pontos foram colocados em quadras comerciais indicadas no OpenStreetMap (CLN, CLS e Setor Comercial Sul); não representam endereços confirmados dos estabelecimentos fictícios.
+- Os bares, eventos, avaliações, ofertas, números de ocupação, fotos, perfis e publicações são dados fictícios de demonstração. Os pontos foram colocados em quadras comerciais indicadas no OpenStreetMap (CLN, CLS e Setor Comercial Sul); não representam endereços confirmados dos estabelecimentos fictícios.
 - As abas Explorar, Feed e Missões têm interação visual inicial; conecte-as às páginas reais do projeto.
 - Os dados cartográficos são do OpenStreetMap; a disponibilidade dos tiles depende do serviço e de suas políticas de uso. Consulte a atribuição exibida no mapa e [a política oficial de tiles](https://operations.osmfoundation.org/policies/tiles/).
