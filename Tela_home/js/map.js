@@ -77,7 +77,7 @@ window.InbarMap = (() => {
       marker.className = `map-marker ${selected ? "selected" : ""}`;
       marker.style.setProperty("--marker", selected ? colors.purple : colors[place.level]);
       marker.setAttribute("aria-hidden", "true");
-      marker.innerHTML = '<span class="marker-pin"><svg class="icon" aria-hidden="true"><use href="assets/icons.svg#map-pin"></use></svg></span>';
+      marker.innerHTML = '<span class="marker-pin"><svg class="icon" aria-hidden="true"><use href="assets/icons.svg#martini"></use></svg></span>';
       const icon = window.L.divIcon({
         className: "inbar-marker-host",
         html: marker,
