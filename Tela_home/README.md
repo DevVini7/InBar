@@ -2,6 +2,13 @@
 
 Projeto front-end em HTML, CSS e JavaScript. O mapa usa Leaflet e tiles cartográficos reais do OpenStreetMap, sem chave de API.
 
+## Organização dos arquivos
+- `js/places.js`: dados demonstrativos dos locais.
+- `js/map.js`: criação do mapa, marcadores, navegação e geolocalização.
+- `js/place-card.js`: conteúdo e expansão do cartão de detalhes na HOME.
+- `js/app.js`: filtros, busca e eventos da interface.
+- `css/style.css`: estilos da tela e dos componentes.
+
 ## Como executar
 1. Extraia o ZIP para uma pasta.
 2. Abra a pasta no VS Code.
