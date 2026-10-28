@@ -88,6 +88,8 @@ window.InbarMap = (() => {
       marker.className = `map-marker ${selected ? "selected" : ""}`;
       marker.style.setProperty("--marker", selected ? colors.purple : colors[place.level]);
       marker.setAttribute("aria-hidden", "true");
+      const markerHead = document.createElement("span");
+      markerHead.className = "marker-head";
       const markerIcon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
       const use = document.createElementNS("http://www.w3.org/2000/svg", "use");
       markerIcon.classList.add("icon");
@@ -96,7 +98,8 @@ window.InbarMap = (() => {
       markerIcon.append(use);
       const pin = document.createElement("span");
       pin.className = "marker-pin";
-      pin.append(markerIcon);
+      markerHead.append(markerIcon);
+      pin.append(markerHead);
       marker.append(pin);
       const icon = window.L.divIcon({
         className: "inbar-marker-host",

@@ -350,7 +350,7 @@ window.inbarPlaces = [{
   reviews: 88
 }, {
   id: 21,
-  name: "Zequinha Pizza e Bar",
+  name: "Pizzaria e Bar Zequinha",
   category: "Bares",
   icon: "beer",
   types: ["Bares", "Eventos"],
@@ -363,7 +363,7 @@ window.inbarPlaces = [{
   posts: 10,
   image: "https://images.unsplash.com/photo-1514933651103-005eec06c04b?w=900&h=560&fit=crop",
   desc: "Pizza para dividir, massa assada e clima de bar no Paranoá.",
-  searchTerms: ["pizzaria e bar zequinha", "pizzaria", "pizza", "paranoa"],
+  searchTerms: ["zequinha pizza e bar", "pizzaria", "pizza", "paranoa"],
   rating: "4,6",
   reviews: 73
 }, {
@@ -386,7 +386,7 @@ window.inbarPlaces = [{
   reviews: 59
 }, {
   id: 23,
-  name: "Botequim 32",
+  name: "Butequim 32",
   category: "Bares",
   icon: "beer",
   types: ["Bares", "Música ao vivo", "Happy Hour"],
@@ -399,7 +399,7 @@ window.inbarPlaces = [{
   posts: 12,
   image: "https://images.unsplash.com/photo-1514933651103-005eec06c04b?w=900&h=560&fit=crop",
   desc: "Petiscos, conversa e música ao vivo em noites selecionadas.",
-  searchTerms: ["butequim 32", "botequim da 32", "boteco", "petiscos", "paranoa"],
+  searchTerms: ["botequim 32", "botequim da 32", "boteco", "petiscos", "paranoa"],
   rating: "4,8",
   reviews: 91
 }, {

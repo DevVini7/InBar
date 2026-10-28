@@ -148,38 +148,37 @@
   transition: transform .16s ease;
 }
 
-.marker-pin::before {
-  content: "";
+.marker-head {
   position: absolute;
-  top: 2px;
-  left: 7px;
-  width: 34px;
-  height: 34px;
+  z-index: 1;
+  top: 1px;
+  left: 6px;
+  display: grid;
+  width: 36px;
+  height: 36px;
+  place-items: center;
   border: 2.5px solid var(--marker);
-  border-radius: 50% 50% 50% 8%;
-  transform: rotate(-45deg);
+  border-radius: 50%;
   background: color-mix(in srgb, var(--marker) 15%, #050a16);
 }
 
 .marker-pin::after {
   content: "";
   position: absolute;
-  top: 32px;
+  z-index: 0;
+  top: 29px;
   left: 20px;
   border-left: 5px solid transparent;
   border-right: 5px solid transparent;
-  border-top: 11px solid var(--marker);
+  border-top: 14px solid var(--marker);
 }
 
 .marker-pin svg {
-  position: absolute;
-  top: 19px;
-  left: 24px;
+  position: relative;
   z-index: 1;
   display: block;
   width: 20px;
   height: 20px;
-  transform: translate(-50%, -50%);
   fill: none;
   stroke: #f5f7ff;
   stroke-width: 2;
@@ -192,6 +191,6 @@
   transform: scale(1.17);
 }
 
-.map-marker.selected .marker-pin::before {
+.map-marker.selected .marker-head {
   box-shadow: 0 0 0 4px #d1d5db35, 0 0 22px #d1d5db;
 }
