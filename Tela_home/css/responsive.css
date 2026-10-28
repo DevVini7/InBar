@@ -14,8 +14,14 @@
     min-width: auto;
   }
 
+  .brand-icon {
+    width: 40px;
+    height: 40px;
+  }
+
   .brand-logo {
-    width: 130px;
+    width: 92px;
+    height: 42px;
   }
 
   .main-nav {
@@ -71,9 +77,18 @@
     gap: 12px;
   }
 
+  .brand {
+    gap: 3px;
+  }
+
+  .brand-icon {
+    width: 36px;
+    height: 36px;
+  }
+
   .brand-logo {
-    width: 112px;
-    height: 40px;
+    width: 82px;
+    height: 38px;
   }
 
   .main-nav {
@@ -471,9 +486,14 @@
 }
 
 @media (max-width: 390px) {
+  .brand-icon {
+    width: 32px;
+    height: 32px;
+  }
+
   .brand-logo {
-    width: 98px;
-    height: 33px;
+    width: 74px;
+    height: 34px;
   }
 
   .place-card {
