@@ -192,6 +192,7 @@ function setupEvents() {
   document.getElementById("detailsButton").addEventListener("click", togglePlaceDetails);
   document.getElementById("allPosts").addEventListener("click", () => showToast("Feed de publicações demonstrativo."));
   document.getElementById("feedButton").addEventListener("click", showPlaceFeed);
+  document.getElementById("directionsButton").addEventListener("click", window.InbarPlaceCard.toggleNavigationOptions);
   document.querySelectorAll(".nav-link").forEach(button => {
     button.addEventListener("click", () => {
       document.querySelectorAll(".nav-link").forEach(link => link.classList.remove("active"));
@@ -204,6 +205,7 @@ function setupEvents() {
   document.getElementById("profileButton").addEventListener("click", toggleProfileMenu);
   document.addEventListener("click", event => {
     if (!event.target.closest(".profile-menu-wrap")) closeProfileMenu();
+    if (!event.target.closest(".navigation-picker")) window.InbarPlaceCard.closeNavigationOptions();
     if (!event.target.closest(".search")) {
       document.getElementById("searchResults").classList.add("hidden");
       document.getElementById("searchInput").setAttribute("aria-expanded", "false");
@@ -212,6 +214,7 @@ function setupEvents() {
   document.addEventListener("keydown", event => {
     if (event.key === "Escape") {
       closeProfileMenu();
+      window.InbarPlaceCard.closeNavigationOptions();
       document.getElementById("searchResults").classList.add("hidden");
       document.getElementById("searchInput").setAttribute("aria-expanded", "false");
     }

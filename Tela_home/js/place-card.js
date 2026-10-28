@@ -40,7 +40,33 @@ window.InbarPlaceCard = (() => {
     renderFeatures(place);
     renderPosts(place, photos);
     document.getElementById("promotionText").textContent = "Condições demonstrativas";
-    document.getElementById("directionsLink").href = `https://www.openstreetmap.org/directions?to=${place.lat}%2C${place.lng}`;
+    configureDirections(place);
+  }
+
+  function configureDirections(place) {
+    const directionsButton = document.getElementById("directionsButton");
+    const navigationOptions = document.getElementById("navigationOptions");
+    const coordinates = [place.lat, place.lng];
+    const hasCoordinates = coordinates.every(Number.isFinite) &&
+      place.lat >= -90 && place.lat <= 90 &&
+      place.lng >= -180 && place.lng <= 180;
+
+    navigationOptions.classList.add("hidden");
+    directionsButton.setAttribute("aria-expanded", "false");
+    directionsButton.disabled = !hasCoordinates;
+    if (!hasCoordinates) {
+      directionsButton.title = "Não há coordenadas disponíveis para este local.";
+      document.getElementById("googleMapsLink").removeAttribute("href");
+      document.getElementById("wazeLink").removeAttribute("href");
+      return;
+    }
+
+    directionsButton.removeAttribute("title");
+    const destination = `${place.lat},${place.lng}`;
+    document.getElementById("googleMapsLink").href =
+      `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(destination)}&travelmode=driving`;
+    document.getElementById("wazeLink").href =
+      `https://waze.com/ul?ll=${encodeURIComponent(destination)}&navigate=yes`;
   }
 
   const placeColors = {
@@ -179,11 +205,27 @@ window.InbarPlaceCard = (() => {
     return expanded;
   }
 
+  function toggleNavigationOptions() {
+    const button = document.getElementById("directionsButton");
+    const options = document.getElementById("navigationOptions");
+    if (button.disabled) return;
+    const isExpanded = button.getAttribute("aria-expanded") === "true";
+    button.setAttribute("aria-expanded", String(!isExpanded));
+    options.classList.toggle("hidden", isExpanded);
+  }
+
+  function closeNavigationOptions() {
+    document.getElementById("directionsButton").setAttribute("aria-expanded", "false");
+    document.getElementById("navigationOptions").classList.add("hidden");
+  }
+
   return {
     render,
     setExpanded,
     show,
     hide,
-    isExpanded
+    isExpanded,
+    toggleNavigationOptions,
+    closeNavigationOptions
   };
 })();

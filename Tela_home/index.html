@@ -258,17 +258,24 @@
             </svg>
             Ver feed do local
           </button>
-          <a
-            class="directions-button"
-            id="directionsLink"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <svg class="icon" aria-hidden="true">
-              <use href="assets/icons.svg#navigation"></use>
-            </svg>
-            Como chegar
-          </a>
+          <div class="navigation-picker">
+            <button
+              class="directions-button"
+              id="directionsButton"
+              type="button"
+              aria-expanded="false"
+              aria-controls="navigationOptions"
+            >
+              <svg class="icon" aria-hidden="true">
+                <use href="assets/icons.svg#navigation"></use>
+              </svg>
+              Como chegar
+            </button>
+            <div class="navigation-options hidden" id="navigationOptions" aria-label="Escolha um aplicativo de navegação">
+              <a id="googleMapsLink" target="_blank" rel="noopener noreferrer">Google Maps</a>
+              <a id="wazeLink" target="_blank" rel="noopener noreferrer">Waze</a>
+            </div>
+          </div>
         </div>
       </div>
     </section>
