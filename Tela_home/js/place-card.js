@@ -24,17 +24,19 @@ window.InbarPlaceCard = (() => {
     document.getElementById("placeStatus").textContent = place.status;
     document.getElementById("placeOccupancy").textContent = `${place.occupancy}%`;
     document.getElementById("placePosts").textContent = place.posts;
-    document.getElementById("placeImage").src = place.image;
+    const primaryImage = place.images && place.images.length ? place.images[0] : place.image;
+    document.getElementById("placeImage").src = primaryImage;
     document.getElementById("placeImage").alt = `Ambiente de ${place.name}`;
     document.getElementById("statusDot").style.borderColor = placeColors[place.level];
     document.getElementById("placeStatus").style.color = placeColors[place.level];
 
-    const photos = [
+    const hasCustomPhotos = Boolean(place.images && place.images.length);
+    const photos = hasCustomPhotos ? place.images : [
       place.image.replace("w=900&h=560", "w=900&h=600"),
       "https://images.unsplash.com/photo-1501386761578-eac5c94b800a?w=900&h=600&fit=crop",
       "https://images.unsplash.com/photo-1514933651103-005eec06c04b?w=900&h=600&fit=crop"
     ];
-    renderPhotos(photos, onMessage);
+    renderPhotos(photos, onMessage, hasCustomPhotos);
     renderFeatures(place);
     renderPosts(place, photos);
     document.getElementById("promotionText").textContent = "Condições demonstrativas";
@@ -47,7 +49,12 @@ window.InbarPlaceCard = (() => {
     red: "#ff4d52"
   };
 
-  function renderPhotos(photos, onMessage) {
+  function getThumbnailSource(source, width, height) {
+    return source.replace("w=900&h=600", `w=${width}&h=${height}`)
+      .replace("w=900&h=560", `w=${width}&h=${height}`);
+  }
+
+  function renderPhotos(photos, onMessage, hasCustomPhotos) {
     photosElement.replaceChildren();
     photos.forEach((source, index) => {
       const button = document.createElement("button");
@@ -55,23 +62,26 @@ window.InbarPlaceCard = (() => {
       button.type = "button";
       button.setAttribute("aria-label", `Mostrar foto ${index + 1}`);
       const image = document.createElement("img");
-      image.src = source.replace("w=900&h=600", "w=120&h=100");
+      image.src = getThumbnailSource(source, 120, 100);
       image.alt = "";
       button.append(image);
       button.addEventListener("click", () => {
         document.getElementById("placeImage").src = source;
+        document.getElementById("placeImage").alt = `Ambiente de ${document.getElementById("placeName").textContent}`;
         photosElement.querySelectorAll(".gallery-thumb").forEach(thumb => thumb.classList.remove("active"));
         button.classList.add("active");
       });
       photosElement.append(button);
     });
 
-    const morePhotos = document.createElement("button");
-    morePhotos.className = "gallery-thumb gallery-more";
-    morePhotos.type = "button";
-    morePhotos.textContent = "+8 fotos";
-    morePhotos.addEventListener("click", () => onMessage("Galeria de fotos demonstrativa."));
-    photosElement.append(morePhotos);
+    if (!hasCustomPhotos) {
+      const morePhotos = document.createElement("button");
+      morePhotos.className = "gallery-thumb gallery-more";
+      morePhotos.type = "button";
+      morePhotos.textContent = "+8 fotos";
+      morePhotos.addEventListener("click", () => onMessage("Galeria de fotos demonstrativa."));
+      photosElement.append(morePhotos);
+    }
   }
 
   function renderFeatures(place) {
@@ -110,12 +120,12 @@ window.InbarPlaceCard = (() => {
       user: "mariana.r",
       time: "há 28 min",
       text: "Happy hour imperdível! 🍹",
-      image: photos[2]
+      image: photos[2] || photos[0]
     }, {
       user: "villaficial",
       time: "há 1 h",
       text: `${place.desc} 🎶`,
-      image: photos[1]
+      image: photos[1] || photos[0]
     }];
     postList.replaceChildren();
     posts.forEach(post => {
@@ -135,7 +145,7 @@ window.InbarPlaceCard = (() => {
       author.append(avatar, authorInfo);
       const image = document.createElement("img");
       image.className = "post-image";
-      image.src = post.image.replace("w=900&h=600", "w=360&h=180");
+      image.src = getThumbnailSource(post.image, 360, 180);
       image.alt = `Publicação demonstrativa de ${post.user}`;
       const caption = document.createElement("p");
       caption.textContent = post.text;

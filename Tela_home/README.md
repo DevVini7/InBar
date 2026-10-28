@@ -36,6 +36,12 @@ Projeto front-end em HTML, CSS e JavaScript. O mapa usa Leaflet e tiles cartogr�
 - Para conteúdo criado por JavaScript, crie o elemento SVG e o `<use>` com `document.createElementNS`, seguindo o exemplo em `js/place-card.js`.
 - Os ícones ficam no projeto: não adicione dependências de ícones por API ou CDN. Ao incluir ícones Lucide, atualize os símbolos e os avisos de licença em `assets/LICENSE`.
 
+## Como adicionar imagens aos locais
+- Coloque os arquivos de imagem dentro de `assets/places/`, por exemplo `Tela_home/assets/places/up-and-down.jpg`.
+- No registro do local em `js/places.js`, defina `image: "assets/places/up-and-down.jpg"`. O caminho é relativo ao `index.html`.
+- Para uma galeria própria, use também `images: ["assets/places/up-and-down.jpg", "assets/places/up-and-down-2.jpg"]`. A primeira imagem será a capa; as demais aparecem como miniaturas quando os detalhes forem expandidos.
+- Formatos comuns como JPG, PNG e WebP são aceitos pelo navegador. Use nomes simples, sem espaços, e mantenha os arquivos no projeto para não depender de links externos.
+
 ## Observações
 - Os bares, boates, atividades, eventos, avaliações, ofertas, números de ocupação, fotos, perfis e publicações são dados fictícios de demonstração; nomes e regiões de alguns locais foram informados pelo usuário ou conferidos em listagens públicas. As coordenadas continuam aproximadas e não representam endereços exatos nem movimento real. Trem Bão está indicado em Lago Norte; os pontos da orla ficam em terra, perto do Lago Paranoá, nunca sobre a água.
 - As abas Explorar, Feed e Missões têm interação visual inicial; conecte-as às páginas reais do projeto.
