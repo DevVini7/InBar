@@ -14,6 +14,9 @@ Projeto front-end em HTML, CSS e JavaScript. O mapa usa Leaflet e tiles cartogr�
 - `css/map-controls.css`: legenda, controles do mapa, notificações e marcadores.
 - `css/profile-menu.css`: menu de perfil da HOME.
 - `css/responsive.css`: ajustes para tablets e celulares.
+- `css/missions.css`: estilos isolados da tela de Missões.
+- `js/missions.js`: filtros, busca, detalhes e progresso demonstrativo das missões.
+- `missions.html`: atalho que abre a tela integrada em `index.html#missions`; `missoes/index.html` mantém o caminho antigo como redirecionamento.
 
 ## Como executar
 1. Extraia o ZIP para uma pasta.
@@ -28,6 +31,7 @@ Projeto front-end em HTML, CSS e JavaScript. O mapa usa Leaflet e tiles cartogr�
 - Filtros por bares, boates, música ao vivo, eventos, happy hour e hobbies; a busca sugere lugares e aceita nomes, regiões e termos relacionados, sem diferenciar acentos.
 - Marcadores com ícones SVG Lucide distintos para bares, boates, música ao vivo, eventos, boliche e karaokê; o mapa enquadra os pontos cadastrados e ancora cada pin na coordenada do local.
 - Menu visual de perfil com as opções "Meus cupons", "Personalização" e "Sair", ainda sem ações conectadas.
+- Tela de Missões integrada à navegação: use "Missões" no cabeçalho; retorne pelo botão "Mapa", pela marca ou pelo histórico do navegador. A busca global filtra missões enquanto essa tela está aberta.
 - Geolocalização do navegador (requer permissão; em geral funciona em localhost ou HTTPS) posicionada sobre o mapa real.
 - Layout adaptável para desktop e celular.
 
@@ -44,5 +48,5 @@ Projeto front-end em HTML, CSS e JavaScript. O mapa usa Leaflet e tiles cartogr�
 
 ## Observações
 - Os bares, boates, atividades, eventos, avaliações, ofertas, números de ocupação, fotos, perfis e publicações são dados fictícios de demonstração; nomes e regiões de alguns locais foram informados pelo usuário ou conferidos em listagens públicas. As coordenadas continuam aproximadas e não representam endereços exatos nem movimento real. Trem Bão está indicado em Lago Norte; os pontos da orla ficam em terra, perto do Lago Paranoá, nunca sobre a água.
-- As abas Explorar, Feed e Missões têm interação visual inicial; conecte-as às páginas reais do projeto.
+- As abas Explorar e Feed ainda têm interação visual demonstrativa. Missões é exibida no mesmo layout compartilhado da HOME, sem repetir o cabeçalho, o perfil ou os controles do mapa.
 - Os dados cartográficos são do OpenStreetMap; a disponibilidade dos tiles depende do serviço e de suas políticas de uso. Consulte a atribuição exibida no mapa e [a política oficial de tiles](https://operations.osmfoundation.org/policies/tiles/).

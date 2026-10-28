@@ -1,6 +1,8 @@
 const places = window.inbarPlaces;
 let selectedId = null;
 let activeFilter = "Todos";
+let activePage = "Mapa";
+let mapSearchValue = "";
 let toastTimer;
 
 function showToast(message) {
@@ -28,6 +30,12 @@ function getVisiblePlaces() {
 function renderSearchResults() {
   const input = document.getElementById("searchInput");
   const results = document.getElementById("searchResults");
+  if (activePage === "Missões") {
+    results.classList.add("hidden");
+    results.replaceChildren();
+    input.setAttribute("aria-expanded", "false");
+    return;
+  }
   const query = input.value.trim();
   if (!query) {
     results.classList.add("hidden");
@@ -116,6 +124,7 @@ function applyFilter(button) {
 
 function submitSearch(event) {
   event.preventDefault();
+  if (activePage === "Missões") return;
   const query = document.getElementById("searchInput").value.trim();
   const firstPlace = getVisiblePlaces()[0];
   if (!firstPlace) {
@@ -131,6 +140,7 @@ function submitSearch(event) {
 }
 
 function updateSearchResults() {
+  if (activePage === "Missões") return;
   const query = document.getElementById("searchInput").value;
   document.getElementById("clearSearch").style.display = query ? "block" : "none";
   const visiblePlaces = getVisiblePlaces();
@@ -140,11 +150,58 @@ function updateSearchResults() {
 }
 
 function clearSearch() {
-  document.getElementById("searchInput").value = "";
+  const searchInput = document.getElementById("searchInput");
+  searchInput.value = "";
   document.getElementById("clearSearch").style.display = "none";
+  if (activePage === "Missões") {
+    searchInput.dispatchEvent(new Event("input", { bubbles: true }));
+    searchInput.focus();
+    return;
+  }
   renderSearchResults();
   renderMarkers();
-  document.getElementById("searchInput").focus();
+  searchInput.focus();
+}
+
+function setActivePage(page, updateHistory = true) {
+  if (page !== "Mapa" && page !== "Missões") return;
+  if (page === activePage) {
+    if (page === "Mapa") window.InbarMap.resetView();
+    return;
+  }
+
+  const searchInput = document.getElementById("searchInput");
+  if (page === "Missões") {
+    mapSearchValue = searchInput.value;
+    searchInput.value = "";
+  }
+  activePage = page;
+  searchInput.dispatchEvent(new Event("input", { bubbles: true }));
+
+  const missionsVisible = page === "Missões";
+  document.querySelector(".map-shell").classList.toggle("hidden", missionsVisible);
+  document.getElementById("missionsView").classList.toggle("hidden", !missionsVisible);
+  searchInput.placeholder = missionsVisible ? "Buscar missões..." : "Buscar lugares, bairros...";
+  document.title = missionsVisible ? "InBar — Missões" : "Inbar — Mapa";
+  document.getElementById("clearSearch").style.display = "";
+  document.getElementById("searchResults").classList.add("hidden");
+  searchInput.setAttribute("aria-expanded", "false");
+
+  document.querySelectorAll(".nav-link").forEach(link => {
+    link.classList.toggle("active", link.dataset.page === page);
+  });
+
+  if (!missionsVisible) {
+    searchInput.value = mapSearchValue;
+    searchInput.dispatchEvent(new Event("input", { bubbles: true }));
+    document.getElementById("searchResults").classList.add("hidden");
+    searchInput.setAttribute("aria-expanded", "false");
+    window.requestAnimationFrame(() => window.InbarMap.invalidateSize());
+  }
+
+  if (updateHistory) {
+    window.history.pushState({ page }, "", missionsVisible ? "#missions" : "#");
+  }
 }
 
 function closeProfileMenu() {
@@ -195,12 +252,24 @@ function setupEvents() {
   document.getElementById("directionsButton").addEventListener("click", window.InbarPlaceCard.toggleNavigationOptions);
   document.querySelectorAll(".nav-link").forEach(button => {
     button.addEventListener("click", () => {
+      const page = button.dataset.page;
+      if (page === "Missões" || page === "Mapa") {
+        setActivePage(page);
+        return;
+      }
       document.querySelectorAll(".nav-link").forEach(link => link.classList.remove("active"));
       button.classList.add("active");
-      const page = button.dataset.page;
-      if (page !== "Mapa") showToast(`${page}: seção demonstrativa. A navegação pode ser conectada à página correspondente.`);
-      else window.InbarMap.resetView();
+      showToast(`${page}: seção demonstrativa. A navegação pode ser conectada à página correspondente.`);
     });
+  });
+  document.querySelector(".brand").addEventListener("click", event => {
+    if (activePage === "Missões") {
+      event.preventDefault();
+      setActivePage("Mapa");
+    }
+  });
+  window.addEventListener("popstate", () => {
+    setActivePage(window.location.hash === "#missions" ? "Missões" : "Mapa", false);
   });
   document.getElementById("profileButton").addEventListener("click", toggleProfileMenu);
   document.addEventListener("click", event => {
@@ -227,3 +296,4 @@ window.InbarMap.init({
 });
 setupEvents();
 renderMarkers();
+if (window.location.hash === "#missions") setActivePage("Missões", false);
