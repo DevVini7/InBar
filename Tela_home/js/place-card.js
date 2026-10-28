@@ -79,6 +79,8 @@ window.InbarPlaceCard = (() => {
       "Música ao vivo": "music-2",
       "Happy Hour": "martini",
       "Eventos": "calendar-days",
+      "Boates": "headphones",
+      "Hobbies": place.icon || "gamepad-2",
       "Outros": "ellipsis"
     };
     featureList.replaceChildren();

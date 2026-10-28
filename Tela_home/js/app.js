@@ -11,13 +11,75 @@ function showToast(message) {
   toastTimer = setTimeout(() => toast.classList.remove("show"), 2600);
 }
 
+function normalizeText(value) {
+  return value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLocaleLowerCase("pt-BR");
+}
+
 function getVisiblePlaces() {
-  const query = document.getElementById("searchInput").value.trim().toLocaleLowerCase("pt-BR");
+  const query = normalizeText(document.getElementById("searchInput").value.trim());
   return places.filter(place => {
     const matchesFilter = activeFilter === "Todos" || place.types.includes(activeFilter) || place.category === activeFilter;
-    const matchesQuery = !query || `${place.name} ${place.distance} ${place.desc} ${place.types.join(" ")}`.toLocaleLowerCase("pt-BR").includes(query);
+    const searchText = normalizeText(`${place.name} ${place.distance} ${place.desc} ${place.types.join(" ")} ${(place.searchTerms || []).join(" ")}`);
+    const matchesQuery = !query || searchText.includes(query);
     return matchesFilter && matchesQuery;
   });
+}
+
+function renderSearchResults() {
+  const input = document.getElementById("searchInput");
+  const results = document.getElementById("searchResults");
+  const query = input.value.trim();
+  if (!query) {
+    results.classList.add("hidden");
+    results.replaceChildren();
+    input.setAttribute("aria-expanded", "false");
+    return;
+  }
+
+  const matches = getVisiblePlaces();
+  results.replaceChildren();
+  const summary = document.createElement("p");
+  summary.className = "search-results-summary";
+  summary.textContent = matches.length === 1 ? "1 lugar encontrado" : `${matches.length} lugares encontrados`;
+  results.append(summary);
+
+  matches.slice(0, 5).forEach(place => {
+    const option = document.createElement("button");
+    option.type = "button";
+    option.className = "search-result";
+    option.setAttribute("role", "option");
+    const icon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    const use = document.createElementNS("http://www.w3.org/2000/svg", "use");
+    icon.classList.add("icon");
+    icon.setAttribute("aria-hidden", "true");
+    use.setAttribute("href", `assets/icons.svg#${place.icon || "map-pin"}`);
+    icon.append(use);
+    const details = document.createElement("span");
+    details.className = "search-result-details";
+    const name = document.createElement("strong");
+    name.textContent = place.name;
+    const location = document.createElement("small");
+    location.textContent = `${place.distance} · ${place.category}`;
+    details.append(name, location);
+    option.append(icon, details);
+    option.addEventListener("click", () => {
+      input.value = place.name;
+      document.getElementById("clearSearch").style.display = "block";
+      results.classList.add("hidden");
+      input.setAttribute("aria-expanded", "false");
+      selectPlace(place.id, true);
+    });
+    results.append(option);
+  });
+
+  if (!matches.length) {
+    const empty = document.createElement("p");
+    empty.className = "search-results-empty";
+    empty.textContent = "Tente buscar por nome, região ou tipo de lugar.";
+    results.append(empty);
+  }
+  results.classList.remove("hidden");
+  input.setAttribute("aria-expanded", "true");
 }
 
 function renderMarkers() {
@@ -48,6 +110,7 @@ function applyFilter(button) {
   const visiblePlaces = getVisiblePlaces();
   if (!visiblePlaces.some(place => place.id === selectedId)) hideSelectedPlace();
   else renderMarkers();
+  renderSearchResults();
   if (!visiblePlaces.length) showToast("Nenhum lugar encontrado para este filtro.");
 }
 
@@ -61,6 +124,8 @@ function submitSearch(event) {
     return;
   }
   if (!getVisiblePlaces().some(place => place.id === selectedId)) hideSelectedPlace();
+  document.getElementById("searchResults").classList.add("hidden");
+  document.getElementById("searchInput").setAttribute("aria-expanded", "false");
   renderMarkers();
   window.InbarMap.panTo(firstPlace);
 }
@@ -71,13 +136,29 @@ function updateSearchResults() {
   const visiblePlaces = getVisiblePlaces();
   if (!visiblePlaces.length || !visiblePlaces.some(place => place.id === selectedId)) hideSelectedPlace();
   else renderMarkers();
+  renderSearchResults();
 }
 
 function clearSearch() {
   document.getElementById("searchInput").value = "";
   document.getElementById("clearSearch").style.display = "none";
+  renderSearchResults();
   renderMarkers();
   document.getElementById("searchInput").focus();
+}
+
+function closeProfileMenu() {
+  const menu = document.getElementById("profileMenu");
+  menu.classList.add("hidden");
+  document.getElementById("profileButton").setAttribute("aria-expanded", "false");
+}
+
+function toggleProfileMenu() {
+  const button = document.getElementById("profileButton");
+  const menu = document.getElementById("profileMenu");
+  const isOpen = !menu.classList.contains("hidden");
+  menu.classList.toggle("hidden", isOpen);
+  button.setAttribute("aria-expanded", String(!isOpen));
 }
 
 function showNextPlace() {
@@ -100,6 +181,7 @@ function setupEvents() {
   document.querySelectorAll(".filter").forEach(button => button.addEventListener("click", () => applyFilter(button)));
   document.getElementById("searchForm").addEventListener("submit", submitSearch);
   document.getElementById("searchInput").addEventListener("input", updateSearchResults);
+  document.getElementById("searchInput").addEventListener("focus", renderSearchResults);
   document.getElementById("clearSearch").addEventListener("click", clearSearch);
   document.getElementById("zoomIn").addEventListener("click", window.InbarMap.zoomIn);
   document.getElementById("zoomOut").addEventListener("click", window.InbarMap.zoomOut);
@@ -119,7 +201,21 @@ function setupEvents() {
       else window.InbarMap.resetView();
     });
   });
-  document.getElementById("profileButton").addEventListener("click", () => showToast("Perfil do usuário — conecte aqui a tela de perfil."));
+  document.getElementById("profileButton").addEventListener("click", toggleProfileMenu);
+  document.addEventListener("click", event => {
+    if (!event.target.closest(".profile-menu-wrap")) closeProfileMenu();
+    if (!event.target.closest(".search")) {
+      document.getElementById("searchResults").classList.add("hidden");
+      document.getElementById("searchInput").setAttribute("aria-expanded", "false");
+    }
+  });
+  document.addEventListener("keydown", event => {
+    if (event.key === "Escape") {
+      closeProfileMenu();
+      document.getElementById("searchResults").classList.add("hidden");
+      document.getElementById("searchInput").setAttribute("aria-expanded", "false");
+    }
+  });
 }
 
 window.InbarMap.init({

@@ -50,8 +50,19 @@ window.InbarMap = (() => {
 
   function resetView() {
     if (!leafletMap) return;
-    const zoom = window.matchMedia("(max-width: 760px)").matches ? 12.25 : 13;
-    leafletMap.setView([-15.7885, -47.89], zoom);
+    const mobile = window.matchMedia("(max-width: 760px)").matches;
+    const places = window.inbarPlaces || [];
+    if (!places.length) {
+      leafletMap.setView([-15.7885, -47.89], mobile ? 11 : 12);
+      return;
+    }
+
+    const bounds = window.L.latLngBounds(places.map(place => [place.lat, place.lng]));
+    leafletMap.fitBounds(bounds, {
+      paddingTopLeft: mobile ? [16, 76] : [220, 30],
+      paddingBottomRight: [48, 48],
+      maxZoom: mobile ? 10.5 : 11.5
+    });
   }
 
   function invalidateSize() {
@@ -77,12 +88,21 @@ window.InbarMap = (() => {
       marker.className = `map-marker ${selected ? "selected" : ""}`;
       marker.style.setProperty("--marker", selected ? colors.purple : colors[place.level]);
       marker.setAttribute("aria-hidden", "true");
-      marker.innerHTML = '<span class="marker-pin"><svg class="icon" aria-hidden="true"><use href="assets/icons.svg#martini"></use></svg></span>';
+      const markerIcon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      const use = document.createElementNS("http://www.w3.org/2000/svg", "use");
+      markerIcon.classList.add("icon");
+      markerIcon.setAttribute("aria-hidden", "true");
+      use.setAttribute("href", `assets/icons.svg#${place.icon || "map-pin"}`);
+      markerIcon.append(use);
+      const pin = document.createElement("span");
+      pin.className = "marker-pin";
+      pin.append(markerIcon);
+      marker.append(pin);
       const icon = window.L.divIcon({
         className: "inbar-marker-host",
         html: marker,
         iconSize: [48, 54],
-        iconAnchor: [24, 48]
+        iconAnchor: [24, 43]
       });
       window.L.marker([place.lat, place.lng], {
           icon,

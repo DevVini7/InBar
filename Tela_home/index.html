@@ -13,6 +13,7 @@
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/place-card.css">
   <link rel="stylesheet" href="css/map-controls.css">
+  <link rel="stylesheet" href="css/profile-menu.css">
   <link rel="stylesheet" href="css/responsive.css">
 </head>
 
@@ -79,22 +80,38 @@
       <button class="nav-link" data-page="Feed">Feed</button>
       <button class="nav-link" data-page="Missões">Missões</button>
     </nav>
-    <form class="search" id="searchForm">
+    <form class="search" id="searchForm" role="search">
       <svg class="icon search-icon" aria-hidden="true">
         <use href="assets/icons.svg#search"></use>
       </svg>
-      <input id="searchInput" type="search" placeholder="Buscar lugares, bairros..." autocomplete="off">
+      <input id="searchInput" type="search" placeholder="Buscar lugares, bairros..." autocomplete="off" aria-controls="searchResults" aria-expanded="false">
       <button class="clear-search" type="button" id="clearSearch" aria-label="Limpar busca">
         <svg class="icon" aria-hidden="true">
           <use href="assets/icons.svg#x"></use>
         </svg>
       </button>
+      <div class="search-results hidden" id="searchResults" role="listbox" aria-label="Resultados da busca"></div>
     </form>
-    <button class="avatar-button" id="profileButton" aria-label="Abrir perfil">
+    <div class="profile-menu-wrap">
+      <button class="avatar-button" id="profileButton" aria-label="Abrir menu do perfil" aria-haspopup="menu" aria-expanded="false" aria-controls="profileMenu">
       <svg class="icon" aria-hidden="true">
         <use href="assets/icons.svg#user-round"></use>
       </svg>
-    </button>
+      </button>
+      <div class="profile-menu hidden" id="profileMenu" role="menu" aria-label="Menu do perfil">
+        <p class="profile-menu-title">Minha conta</p>
+        <button type="button" role="menuitem">
+          <svg class="icon" aria-hidden="true"><use href="assets/icons.svg#ticket-percent"></use></svg>
+          Meus cupons
+        </button>
+        <button type="button" role="menuitem">
+          <svg class="icon" aria-hidden="true"><use href="assets/icons.svg#settings-2"></use></svg>
+          Personalização
+        </button>
+        <div class="profile-menu-divider"></div>
+        <button type="button" role="menuitem" class="profile-sign-out">Sair</button>
+      </div>
+    </div>
   </header>
 
   <main class="map-shell">
@@ -107,7 +124,7 @@
             <use href="assets/icons.svg#list-filter"></use>
           </svg>
         </span>
-        Todos
+        <span class="filter-label">Todos</span>
       </button>
       <button class="filter" data-filter="Bares">
         <span class="filter-icon">
@@ -115,7 +132,15 @@
             <use href="assets/icons.svg#beer"></use>
           </svg>
         </span>
-        Bares
+        <span class="filter-label">Bares</span>
+      </button>
+      <button class="filter" data-filter="Boates">
+        <span class="filter-icon">
+          <svg class="icon" aria-hidden="true">
+            <use href="assets/icons.svg#headphones"></use>
+          </svg>
+        </span>
+        <span class="filter-label">Boates</span>
       </button>
       <button class="filter" data-filter="Eventos">
         <span class="filter-icon">
@@ -123,7 +148,7 @@
             <use href="assets/icons.svg#calendar-days"></use>
           </svg>
         </span>
-        Eventos
+        <span class="filter-label">Eventos</span>
       </button>
       <button class="filter" data-filter="Música ao vivo">
         <span class="filter-icon">
@@ -131,7 +156,7 @@
             <use href="assets/icons.svg#music-2"></use>
           </svg>
         </span>
-        Música ao vivo
+        <span class="filter-label">Música ao vivo</span>
       </button>
       <button class="filter" data-filter="Happy Hour">
         <span class="filter-icon">
@@ -139,15 +164,15 @@
             <use href="assets/icons.svg#tag"></use>
           </svg>
         </span>
-        Happy Hour
+        <span class="filter-label">Happy Hour</span>
       </button>
-      <button class="filter" data-filter="Outros">
+      <button class="filter" data-filter="Hobbies">
         <span class="filter-icon">
           <svg class="icon" aria-hidden="true">
-            <use href="assets/icons.svg#ellipsis"></use>
+            <use href="assets/icons.svg#gamepad-2"></use>
           </svg>
         </span>
-        Outros
+        <span class="filter-label">Hobbies</span>
       </button>
     </aside>
 

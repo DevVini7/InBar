@@ -39,12 +39,12 @@
 
   .filters {
     left: 14px;
-    width: 145px;
+    width: 190px;
   }
 
   .filter {
     font-size: 14px;
-    height: 49px;
+    min-height: 44px;
     gap: 10px;
   }
 
@@ -107,26 +107,40 @@
   }
 
   .filters {
-    top: 12px;
+    top: 10px;
     left: 10px;
-    width: 44px;
+    right: 10px;
+    width: auto;
+    flex-direction: row;
     gap: 7px;
+    overflow-x: auto;
+    padding: 1px 2px 7px;
+    scrollbar-width: none;
+  }
+
+  .filters::-webkit-scrollbar {
+    display: none;
   }
 
   .filter {
-    height: 43px;
-    width: 44px;
-    padding: 0;
-    justify-content: center;
-    border-radius: 15px;
-    font-size: 0;
-    gap: 0;
+    width: auto;
+    min-height: 40px;
+    flex: 0 0 auto;
+    padding: 0 12px;
+    border-radius: 22px;
+    font-size: 12px;
+    gap: 8px;
   }
 
   .filter-icon {
-    width: 21px;
-    height: 21px;
-    flex-basis: 21px;
+    width: 18px;
+    height: 18px;
+    flex-basis: 18px;
+  }
+
+  .filter-icon .icon {
+    width: 18px;
+    height: 18px;
   }
 
   .place-card {

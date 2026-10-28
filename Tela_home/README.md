@@ -12,6 +12,7 @@ Projeto front-end em HTML, CSS e JavaScript. O mapa usa Leaflet e tiles cartogr�
 - `css/style.css`: estilos globais, cabeçalho, mapa e filtros.
 - `css/place-card.css`: cartão compacto e expandido dos locais.
 - `css/map-controls.css`: legenda, controles do mapa, notificações e marcadores.
+- `css/profile-menu.css`: menu de perfil da HOME.
 - `css/responsive.css`: ajustes para tablets e celulares.
 
 ## Como executar
@@ -24,7 +25,9 @@ Projeto front-end em HTML, CSS e JavaScript. O mapa usa Leaflet e tiles cartogr�
 - Mapa cartográfico real e interativo, centrado no Plano Piloto e enquadrado para mostrar as Asas Norte e Sul, com tratamento escuro em tons de cinza inspirado em mapas de navegação. Arraste para navegar e use a roda do mouse ou os botões +/− para aproximar.
 - Marcadores clicáveis com cores de status. Os detalhes do lugar só aparecem ao selecionar um marcador.
 - O cartão do local pode ser expandido na própria tela HOME para mostrar fotos, status, destaques e publicações demonstrativas; use "Como chegar" para abrir a rota no OpenStreetMap.
-- Filtros por categoria e busca por nome/bairro.
+- Filtros por bares, boates, música ao vivo, eventos, happy hour e hobbies; a busca sugere lugares e aceita nomes, regiões e termos relacionados, sem diferenciar acentos.
+- Marcadores com ícones SVG Lucide distintos para bares, boates, música ao vivo, eventos, boliche e karaokê; o mapa enquadra os pontos cadastrados e ancora cada pin na coordenada do local.
+- Menu visual de perfil com as opções "Meus cupons", "Personalização" e "Sair", ainda sem ações conectadas.
 - Geolocalização do navegador (requer permissão; em geral funciona em localhost ou HTTPS) posicionada sobre o mapa real.
 - Layout adaptável para desktop e celular.
 
@@ -34,6 +37,6 @@ Projeto front-end em HTML, CSS e JavaScript. O mapa usa Leaflet e tiles cartogr�
 - Os ícones ficam no projeto: não adicione dependências de ícones por API ou CDN. Ao incluir ícones Lucide, atualize os símbolos e os avisos de licença em `assets/LICENSE`.
 
 ## Observações
-- Os bares, eventos, avaliações, ofertas, números de ocupação, fotos, perfis e publicações são dados fictícios de demonstração. Os pontos foram colocados em quadras comerciais indicadas no OpenStreetMap (CLN, CLS e Setor Comercial Sul); não representam endereços confirmados dos estabelecimentos fictícios.
+- Os bares, boates, atividades, eventos, avaliações, ofertas, números de ocupação, fotos, perfis e publicações são dados fictícios de demonstração; nomes e regiões de alguns locais foram informados pelo usuário ou conferidos em listagens públicas. As coordenadas continuam aproximadas e não representam endereços exatos nem movimento real. Trem Bão está indicado em Lago Norte; os pontos da orla ficam em terra, perto do Lago Paranoá, nunca sobre a água.
 - As abas Explorar, Feed e Missões têm interação visual inicial; conecte-as às páginas reais do projeto.
 - Os dados cartográficos são do OpenStreetMap; a disponibilidade dos tiles depende do serviço e de suas políticas de uso. Consulte a atribuição exibida no mapa e [a política oficial de tiles](https://operations.osmfoundation.org/policies/tiles/).

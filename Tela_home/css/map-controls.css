@@ -143,6 +143,7 @@
 .marker-pin {
   position: absolute;
   inset: 0;
+  transform-origin: 24px 43px;
   filter: drop-shadow(0 0 8px var(--marker));
   transition: transform .16s ease;
 }
@@ -172,11 +173,13 @@
 
 .marker-pin svg {
   position: absolute;
-  top: 9px;
-  left: 14px;
+  top: 19px;
+  left: 24px;
   z-index: 1;
+  display: block;
   width: 20px;
   height: 20px;
+  transform: translate(-50%, -50%);
   fill: none;
   stroke: #f5f7ff;
   stroke-width: 2;
