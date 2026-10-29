@@ -457,3 +457,5 @@ window.inbarPlaces = [{
   rating: "4,8",
   reviews: 67
 }];
+
+window.InbarInterests.attachPlaceMetadata(window.inbarPlaces);

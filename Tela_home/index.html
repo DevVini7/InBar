@@ -5,6 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#050711">
   <title>Inbar — Mapa</title>
+  <script src="js/interests.js"></script>
+  <script>
+    try {
+      if (window.InbarInterests.requiresOnboarding()) {
+        window.location.replace("onboarding.html");
+      }
+    } catch (error) {
+      console.error("Não foi possível verificar a conclusão da personalização do InBar.", error);
+    }
+  </script>
   <link rel="preconnect" href="https://unpkg.com" crossorigin>
   <link rel="preconnect" href="https://tile.openstreetmap.org">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -63,7 +73,7 @@
           <svg class="icon" aria-hidden="true"><use href="assets/icons.svg#ticket-percent"></use></svg>
           Meus cupons
         </button>
-        <button type="button" role="menuitem">
+        <button type="button" role="menuitem" id="editPreferences">
           <svg class="icon" aria-hidden="true"><use href="assets/icons.svg#settings-2"></use></svg>
           Personalização
         </button>

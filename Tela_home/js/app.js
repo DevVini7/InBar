@@ -272,6 +272,10 @@ function setupEvents() {
     setActivePage(window.location.hash === "#missions" ? "Missões" : "Mapa", false);
   });
   document.getElementById("profileButton").addEventListener("click", toggleProfileMenu);
+  document.getElementById("editPreferences").addEventListener("click", () => {
+    closeProfileMenu();
+    window.location.assign("./onboarding.html?mode=edit");
+  });
   document.addEventListener("click", event => {
     if (!event.target.closest(".profile-menu-wrap")) closeProfileMenu();
     if (!event.target.closest(".navigation-picker")) window.InbarPlaceCard.closeNavigationOptions();

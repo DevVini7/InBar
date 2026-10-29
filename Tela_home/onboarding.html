@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#050711">
+  <title>InBar | Seus interesses</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/onboarding.css">
+  <script src="js/interests.js"></script>
+</head>
+<body class="onboarding-page">
+  <header class="onboarding-header">
+    <a class="onboarding-brand" href="./index.html" aria-label="InBar">
+      <img src="assets/inbar-mark.png" alt="">
+      <span><b>In</b>Bar</span>
+    </a>
+    <span class="header-note">Sua experiência, do seu jeito</span>
+  </header>
+
+  <main class="onboarding-main">
+    <section class="welcome">
+      <p class="welcome-kicker"><span></span> PERSONALIZAÇÃO INBAR</p>
+      <h1 id="welcomeTitle">Vamos descobrir o seu InBar?</h1>
+      <p id="welcomeDescription">Conte um pouco sobre o que você gosta. Vamos encontrar experiências que combinam com você.</p>
+    </section>
+
+    <ol class="stepper" aria-label="Etapas da personalização">
+      <li class="stepper-item active" data-step-indicator="1"><span>1</span><b>O que você curte?</b></li>
+      <li class="stepper-item" data-step-indicator="2"><span>2</span><b>Explore seus interesses</b></li>
+      <li class="stepper-item" data-step-indicator="3"><span>3</span><b>Seu resumo</b></li>
+    </ol>
+
+    <section class="onboarding-panel">
+      <div class="panel-topline">
+        <div>
+          <p class="panel-eyebrow" id="stepEyebrow">ETAPA 1 DE 3</p>
+          <h2 id="stepTitle" tabindex="-1">O que você curte?</h2>
+        </div>
+        <p class="selection-count" id="selectionCount">0 categorias selecionadas</p>
+      </div>
+
+      <section class="step-panel" data-step-panel="1" aria-labelledby="stepTitle">
+        <p class="step-help">Escolha quantas categorias quiser. Você pode ajustar tudo depois.</p>
+        <div class="category-grid" id="categoryGrid"></div>
+      </section>
+
+      <section class="step-panel" data-step-panel="2" aria-labelledby="stepTitle" hidden>
+        <p class="step-help">Explore os temas que mais combinam com você — selecionar subcategorias é opcional.</p>
+        <div class="subcategory-groups" id="subcategoryGroups"></div>
+      </section>
+
+      <section class="step-panel" data-step-panel="3" aria-labelledby="stepTitle" hidden>
+        <p class="step-help">Confira suas escolhas. Elas vão ajudar a destacar lugares e experiências compatíveis.</p>
+        <div class="preference-summary" id="preferenceSummary"></div>
+      </section>
+
+      <p class="onboarding-status" id="onboardingStatus" role="status" aria-live="polite"></p>
+
+      <footer class="onboarding-actions">
+        <button class="skip-button" id="skipButton" type="button">Pular por agora</button>
+        <div class="step-actions">
+          <button class="back-button" id="backButton" type="button" hidden>Voltar</button>
+          <button class="next-button" id="nextButton" type="button">Continuar <span aria-hidden="true">→</span></button>
+          <button class="finish-button" id="finishButton" type="button" hidden>Personalizar meu InBar <span aria-hidden="true">→</span></button>
+        </div>
+      </footer>
+    </section>
+    <p class="privacy-note"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22s8-4 8-11V5l-8-3-8 3v6c0 7 8 11 8 11Z"></path><path d="m9 12 2 2 4-4"></path></svg>Suas preferências ficam salvas neste dispositivo e podem ser editadas pelo perfil.</p>
+  </main>
+  <script src="js/onboarding.js"></script>
+</body>
+</html>

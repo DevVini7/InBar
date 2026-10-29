@@ -7,6 +7,8 @@ Projeto front-end em HTML, CSS e JavaScript. O mapa usa Leaflet e tiles cartogr�
 - `js/map.js`: criação do mapa, marcadores, navegação e geolocalização.
 - `js/place-card.js`: conteúdo e expansão do cartão de detalhes na HOME.
 - `js/app.js`: filtros, busca e eventos da interface.
+- `js/interests.js`: catálogo de interesses, persistência de preferências e pontuação de compatibilidade para recomendações.
+- `js/onboarding.js`, `onboarding.html` e `css/onboarding.css`: fluxo responsivo de seleção e edição das preferências.
 - `assets/icons.svg`: coleção local de ícones SVG Lucide, reutilizada pela HOME sem API ou CDN.
 - `assets/LICENSE`: avisos de licença dos ícones.
 - `css/style.css`: estilos globais, cabeçalho, mapa e filtros.
@@ -30,7 +32,9 @@ Projeto front-end em HTML, CSS e JavaScript. O mapa usa Leaflet e tiles cartogr�
 - O cartão do local pode ser expandido na própria tela HOME para mostrar fotos, status, destaques e publicações demonstrativas; use "Como chegar" para abrir a rota no OpenStreetMap.
 - Filtros por bares, boates, música ao vivo, eventos, happy hour e hobbies; a busca sugere lugares e aceita nomes, regiões e termos relacionados, sem diferenciar acentos.
 - Marcadores com ícones SVG Lucide distintos para bares, boates, música ao vivo, eventos, boliche e karaokê; o mapa enquadra os pontos cadastrados e ancora cada pin na coordenada do local.
-- Menu visual de perfil com as opções "Meus cupons", "Personalização" e "Sair", ainda sem ações conectadas.
+- Menu visual de perfil com acesso à edição de preferências; as demais opções continuam demonstrativas.
+- Onboarding de interesses no primeiro acesso, com edição pelo menu de perfil e armazenamento versionado em `localStorage`. O projeto não possui autenticação ou backend; neste protótipo, as preferências são associadas a um identificador anônimo persistente no navegador.
+- Metadados de recomendação nos locais existentes no formato `interests: { categoryIds, tags }`. `InbarInterests.getCompatibilityScore()` retorna uma pontuação de 0 a 100; `rankEntities()` retorna pares `{ entity, score }` para preparar recomendações no Feed e em Explorar, sem reordenar nem filtrar os marcadores do mapa. Categorias têm peso 1 e tags específicas peso 2.
 - Tela de Missões integrada à navegação: use "Missões" no cabeçalho; retorne pelo botão "Mapa", pela marca ou pelo histórico do navegador. A busca global filtra missões enquanto essa tela está aberta.
 - Geolocalização do navegador (requer permissão; em geral funciona em localhost ou HTTPS) posicionada sobre o mapa real.
 - Layout adaptável para desktop e celular.
