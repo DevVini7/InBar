@@ -3,15 +3,20 @@
 Projeto front-end em HTML, CSS e JavaScript. O mapa usa Leaflet e tiles cartográficos reais do OpenStreetMap, sem chave de API.
 
 ## Organização dos arquivos
+- `login.html`: tela inicial de login e cadastro, com CSS e JavaScript em seus diretórios dedicados.
+- `index.html`: HOME integrada; em primeiro acesso, encaminha à tela de onboarding até que as preferências sejam concluídas.
+- `onboarding.html`: seleção e personalização de interesses.
 - `js/places.js`: dados demonstrativos dos locais.
 - `js/map.js`: criação do mapa, marcadores, navegação e geolocalização.
 - `js/place-card.js`: conteúdo e expansão do cartão de detalhes na HOME.
 - `js/app.js`: filtros, busca e eventos da interface.
 - `js/interests.js`: catálogo de interesses, persistência de preferências e pontuação de compatibilidade para recomendações.
+- `js/login.js`: validação de login/cadastro em modo de teste e navegação para a HOME.
 - `js/onboarding.js`, `onboarding.html` e `css/onboarding.css`: fluxo responsivo de seleção e edição das preferências.
 - `assets/icons.svg`: coleção local de ícones SVG Lucide, reutilizada pela HOME sem API ou CDN.
 - `assets/LICENSE`: avisos de licença dos ícones.
 - `css/style.css`: estilos globais, cabeçalho, mapa e filtros.
+- `css/login.css`: estilos isolados da tela de autenticação.
 - `css/place-card.css`: cartão compacto e expandido dos locais.
 - `css/map-controls.css`: legenda, controles do mapa, notificações e marcadores.
 - `css/profile-menu.css`: menu de perfil da HOME.
@@ -20,10 +25,13 @@ Projeto front-end em HTML, CSS e JavaScript. O mapa usa Leaflet e tiles cartogr�
 - `js/missions.js`: filtros, busca, detalhes e progresso demonstrativo das missões.
 - `missions.html`: atalho que abre a tela integrada em `index.html#missions`; `missoes/index.html` mantém o caminho antigo como redirecionamento.
 
+## Fluxo inicial
+Abra `index.html` na raiz do projeto para iniciar no login. Após enviar credenciais válidas no modo de teste, o fluxo segue para `Tela_home/index.html`. Se as preferências ainda não tiverem sido concluídas, a HOME encaminha ao onboarding antes de exibir o mapa.
+
 ## Como executar
 1. Extraia o ZIP para uma pasta.
 2. Abra a pasta no VS Code.
-3. Execute `index.html` com a extensão **Live Server** (recomendado), ou sirva a pasta por um servidor local.
+3. Execute `index.html` da raiz com a extensão **Live Server** (recomendado), ou sirva a pasta por um servidor local.
 4. O mapa precisa de conexão com a internet para carregar a biblioteca Leaflet e os mapas do OpenStreetMap. Fontes e fotos de demonstração também carregam de serviços externos.
 
 ## Recursos implementados
@@ -34,6 +42,7 @@ Projeto front-end em HTML, CSS e JavaScript. O mapa usa Leaflet e tiles cartogr�
 - Marcadores com ícones SVG Lucide distintos para bares, boates, música ao vivo, eventos, boliche e karaokê; o mapa enquadra os pontos cadastrados e ancora cada pin na coordenada do local.
 - Menu visual de perfil com acesso à edição de preferências; as demais opções continuam demonstrativas.
 - Onboarding de interesses no primeiro acesso, com edição pelo menu de perfil e armazenamento versionado em `localStorage`. O projeto não possui autenticação ou backend; neste protótipo, as preferências são associadas a um identificador anônimo persistente no navegador.
+- A autenticação fica em `login.html`, com estilos em `css/login.css` e lógica em `js/login.js`. Em modo de teste, qualquer e-mail válido e senha permitem seguir para `index.html`, que encaminha ao onboarding se necessário. O cadastro válido exibe uma confirmação, mas não cria nem armazena uma conta; não há autenticação real ou sessão persistente.
 - Metadados de recomendação nos locais existentes no formato `interests: { categoryIds, tags }`. `InbarInterests.getCompatibilityScore()` retorna uma pontuação de 0 a 100; `rankEntities()` retorna pares `{ entity, score }` para preparar recomendações no Feed e em Explorar, sem reordenar nem filtrar os marcadores do mapa. Categorias têm peso 1 e tags específicas peso 2.
 - Tela de Missões integrada à navegação: use "Missões" no cabeçalho; retorne pelo botão "Mapa", pela marca ou pelo histórico do navegador. A busca global filtra missões enquanto essa tela está aberta.
 - Geolocalização do navegador (requer permissão; em geral funciona em localhost ou HTTPS) posicionada sobre o mapa real.
