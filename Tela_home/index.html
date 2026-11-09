@@ -5,14 +5,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#050711">
   <title>Inbar — Mapa</title>
+  <script src="js/auth.js"></script>
   <script src="js/interests.js"></script>
   <script>
     try {
-      if (window.InbarInterests.requiresOnboarding()) {
+      if (!window.InbarAuth.getCurrentUser()) {
+        window.location.replace("login.html");
+      } else if (window.InbarInterests.requiresOnboarding()) {
         window.location.replace("onboarding.html");
       }
     } catch (error) {
       console.error("Não foi possível verificar a conclusão da personalização do InBar.", error);
+      window.location.replace("login.html");
     }
   </script>
   <link rel="preconnect" href="https://unpkg.com" crossorigin>
@@ -26,6 +30,7 @@
   <link rel="stylesheet" href="css/profile-menu.css">
   <link rel="stylesheet" href="css/responsive.css">
   <link rel="stylesheet" href="css/missions.css">
+  <link rel="stylesheet" href="css/feed.css">
 </head>
 
 <body>
@@ -62,13 +67,26 @@
       <div class="search-results hidden" id="searchResults" role="listbox" aria-label="Resultados da busca"></div>
     </form>
     <div class="profile-menu-wrap">
-      <button class="avatar-button" id="profileButton" aria-label="Abrir menu do perfil" aria-haspopup="menu" aria-expanded="false" aria-controls="profileMenu">
-      <svg class="icon" aria-hidden="true">
-        <use href="assets/icons.svg#user-round"></use>
-      </svg>
+      <button class="profile-trigger" id="profileButton" aria-label="Abrir menu do perfil" aria-haspopup="menu" aria-expanded="false" aria-controls="profileMenu">
+        <span class="avatar-button" aria-hidden="true">
+          <svg class="icon" aria-hidden="true">
+            <use href="assets/icons.svg#user-round"></use>
+          </svg>
+        </span>
+        <span class="profile-trigger-name" id="profileTriggerName">Usuário</span>
       </button>
       <div class="profile-menu hidden" id="profileMenu" role="menu" aria-label="Menu do perfil">
-        <p class="profile-menu-title">Minha conta</p>
+        <div class="profile-menu-identity">
+          <span class="profile-menu-avatar" aria-hidden="true">
+            <svg class="icon"><use href="assets/icons.svg#user-round"></use></svg>
+          </span>
+          <span class="profile-menu-user-details">
+            <strong id="profileFullName">Usuário</strong>
+            <small id="profileEmail"></small>
+          </span>
+        </div>
+        <div class="profile-menu-divider"></div>
+        <p class="profile-menu-title">Perfil</p>
         <button type="button" role="menuitem">
           <svg class="icon" aria-hidden="true"><use href="assets/icons.svg#ticket-percent"></use></svg>
           Meus cupons
@@ -78,102 +96,248 @@
           Personalização
         </button>
         <div class="profile-menu-divider"></div>
-        <button type="button" role="menuitem" class="profile-sign-out">Sair</button>
+        <button type="button" role="menuitem" class="profile-sign-out" id="signOutButton">Sair</button>
       </div>
     </div>
   </header>
 
+  <main class="explore-view hidden" id="exploreView" aria-label="Explorar"></main>
+
+  <main class="feed-view hidden" id="feedView" aria-label="Feed">
+    <div class="feed-layout">
+      <section class="feed-main">
+        <header class="feed-heading">
+          <div>
+            <p class="feed-kicker">COMUNIDADE INBAR</p>
+            <h1>Feed</h1>
+            <p>Experiências, lugares e momentos compartilhados pela comunidade.</p>
+          </div>
+          <button class="feed-primary-button" type="button" data-feed-action="publish">
+            <svg class="icon" aria-hidden="true"><use href="assets/icons.svg#images"></use></svg>
+            Compartilhar experiência
+          </button>
+        </header>
+
+        <p class="feed-prototype-note">
+          Modo protótipo: exemplos recebidos estão identificados; suas publicações e interações ficam salvas neste navegador.
+        </p>
+
+        <div class="feed-filter-section">
+          <div class="feed-filters" id="feedCategoryFilters" role="group" aria-label="Filtrar por categoria"></div>
+          <div class="feed-filters feed-kind-filters" role="group" aria-label="Filtrar por autor">
+            <button type="button" class="feed-filter is-selected" data-feed-kind="Todos" aria-pressed="true">Todos</button>
+            <button type="button" class="feed-filter" data-feed-kind="Pessoas" aria-pressed="false">Pessoas</button>
+            <button type="button" class="feed-filter" data-feed-kind="Estabelecimentos" aria-pressed="false">Estabelecimentos</button>
+          </div>
+        </div>
+
+        <section class="feed-posts" id="feedPosts" aria-label="Publicações" aria-live="polite"></section>
+        <p class="feed-empty" id="feedEmpty" hidden>Nenhuma publicação encontrada. Tente outro filtro ou busca.</p>
+      </section>
+
+      <aside class="feed-sidebar" aria-label="Descubra lugares">
+        <section class="feed-side-panel">
+          <div class="feed-side-heading">
+            <div>
+              <p class="feed-kicker">NO INBAR</p>
+              <h2>Lugares para descobrir</h2>
+            </div>
+            <svg class="icon" aria-hidden="true"><use href="assets/icons.svg#map-pin"></use></svg>
+          </div>
+          <div class="feed-place-list" id="feedPlaceList"></div>
+          <button class="feed-text-button" type="button" data-feed-action="explore">Explorar todos os lugares</button>
+        </section>
+        <p class="feed-sidebar-note">Os locais e suas informações são carregados do catálogo já usado pelo mapa do InBar.</p>
+      </aside>
+    </div>
+
+    <dialog class="feed-dialog" id="publishDialog" aria-labelledby="publishTitle">
+      <form class="feed-dialog-form" id="publishForm">
+        <header class="feed-dialog-heading">
+          <div>
+            <p class="feed-kicker">COMPARTILHE COM A COMUNIDADE</p>
+            <h2 id="publishTitle">Sua experiência</h2>
+          </div>
+          <button class="feed-icon-button" type="button" data-feed-action="close-publish" aria-label="Fechar">
+            <svg class="icon" aria-hidden="true"><use href="assets/icons.svg#x"></use></svg>
+          </button>
+        </header>
+        <label class="feed-field">
+          <span>O que você quer compartilhar?</span>
+          <textarea id="postContent" maxlength="500" required placeholder="Conte sobre um lugar, evento ou experiência..."></textarea>
+        </label>
+        <div class="feed-form-row">
+          <label class="feed-field">
+            <span>Categoria</span>
+            <select id="postCategory" required></select>
+          </label>
+          <label class="feed-field">
+            <span>Estabelecimento (opcional)</span>
+            <select id="postPlace"></select>
+          </label>
+        </div>
+        <label class="feed-field">
+          <span>Imagem (opcional, até 5 MB)</span>
+          <input id="postImage" type="file" accept="image/*">
+        </label>
+        <img class="feed-image-preview" id="postImagePreview" alt="Prévia da imagem escolhida" hidden>
+        <p class="feed-form-note">A publicação será salva apenas neste navegador. O projeto ainda não possui serviço de Feed no servidor.</p>
+        <div class="feed-dialog-actions">
+          <button class="feed-secondary-button" type="button" data-feed-action="close-publish">Cancelar</button>
+          <button class="feed-primary-button" type="submit">Publicar</button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog class="feed-dialog" id="commentsDialog" aria-labelledby="commentsTitle">
+      <section class="feed-dialog-form">
+        <header class="feed-dialog-heading">
+          <div>
+            <p class="feed-kicker">CONVERSA DA COMUNIDADE</p>
+            <h2 id="commentsTitle">Comentários</h2>
+          </div>
+          <button class="feed-icon-button" type="button" data-feed-action="close-comments" aria-label="Fechar">
+            <svg class="icon" aria-hidden="true"><use href="assets/icons.svg#x"></use></svg>
+          </button>
+        </header>
+        <section class="feed-comments-list" id="feedCommentsList" aria-live="polite"></section>
+        <form class="feed-comment-form" id="commentForm">
+          <label class="sr-only" for="commentContent">Escreva um comentário</label>
+          <input id="commentContent" maxlength="240" required placeholder="Escreva um comentário...">
+          <button class="feed-primary-button" type="submit">Enviar</button>
+        </form>
+      </section>
+    </dialog>
+
+    <div class="feed-toast" id="feedToast" role="status" aria-live="polite"></div>
+  </main>
+
   <main class="missions-view hidden" id="missionsView" aria-label="Missões">
     <div class="missions-layout">
-      <section class="mission-banner">
-        <div class="banner-icon" aria-hidden="true">☆</div>
+      <section class="mission-banner" aria-labelledby="missionsTitle">
         <div class="banner-copy">
-          <h1>Missões</h1>
-          <p>Explore, divirta-se e ganhe recompensas!</p>
-          <small>Complete missões, acumule pontos e desbloqueie benefícios exclusivos.</small>
+          <p class="missions-kicker"><span></span> DESAFIOS INBAR</p>
+          <h1 id="missionsTitle">Missões</h1>
+          <p>Explore, participe e descubra novas experiências.</p>
         </div>
-        <div class="level-panel">
-          <div class="level-symbol" aria-hidden="true">✦</div>
-          <div class="level-info">
-            <strong>Nível <span id="levelNumber">3</span></strong>
-            <div class="progress"><span id="xpProgress" style="width:56%"></span></div>
-            <small><span id="xpCurrent">420</span> / <span id="xpGoal">750</span> XP</small>
-          </div>
-          <div class="reward-next"><span class="gift" aria-hidden="true">♔</span><div><small>Próxima recompensa</small><b>50 pontos</b></div><span aria-hidden="true">›</span></div>
+        <div class="banner-mark" aria-hidden="true">
+          <svg class="icon"><use href="assets/icons.svg#star"></use></svg>
         </div>
       </section>
 
-      <div class="section-title">
-        <span aria-hidden="true">◎</span>
-        <div><h2>Missões Ativas</h2><p>Complete as missões abaixo e ganhe pontos, XP e recompensas!</p></div>
-      </div>
+      <section class="mission-profile" aria-label="Progresso do usuário">
+        <div class="mission-profile-identity">
+          <span class="mission-avatar" aria-hidden="true">
+            <svg class="icon"><use href="assets/icons.svg#user-round"></use></svg>
+          </span>
+          <div>
+            <p class="mission-profile-label">SUA JORNADA NO INBAR</p>
+            <h2 id="missionsUserName">Usuário</h2>
+            <p class="mission-profile-note">Seu progresso será exibido quando as missões estiverem integradas.</p>
+          </div>
+        </div>
+        <div class="mission-profile-stats" aria-label="Dados de progresso ainda indisponíveis">
+          <div><span>—</span><small>Nível</small></div>
+          <div><span>—</span><small>XP</small></div>
+          <div><span>—</span><small>Concluídas</small></div>
+        </div>
+      </section>
 
-      <div class="mission-filter-row" role="group" aria-label="Filtrar missões">
-        <button class="mission-filter selected" type="button" data-category="Todos">Todas</button>
-        <button class="mission-filter" type="button" data-category="Bares">Bares</button>
-        <button class="mission-filter" type="button" data-category="Eventos">Eventos</button>
-        <button class="mission-filter" type="button" data-category="Música ao vivo">Música ao vivo</button>
-        <button class="mission-filter" type="button" data-category="Happy Hour">Happy Hour</button>
-        <button class="mission-filter" type="button" data-category="Outros">Outros</button>
-      </div>
+      <div class="missions-content-grid">
+        <section class="missions-main-column" aria-labelledby="missionsSectionTitle">
+          <div class="section-title">
+            <div>
+              <p class="missions-section-kicker">EXPLORE NO SEU RITMO</p>
+              <h2 id="missionsSectionTitle">Desafios em prévia</h2>
+              <p>Conheça ideias de desafios que poderão fazer parte da sua experiência.</p>
+            </div>
+            <span class="mission-count" id="missionCount" aria-live="polite"></span>
+          </div>
 
-      <div class="content-grid">
-        <section class="missions-list" id="missionsList" aria-label="Todas as missões">
-          <article class="mission-card" data-search="explore bairro estabelecimentos">
-            <div class="mission-icon teal" aria-hidden="true">♙</div>
-            <div class="mission-description"><h3>Explore o bairro</h3><p>Visite 3 estabelecimentos diferentes<br>no mesmo bairro.</p>
-              <div class="mission-progress"><span style="width:33%"></span></div><small class="count">1/3</small>
-            </div>
-            <div class="mission-reward"><b>✦ <span>+100 XP</span></b><p>◉ <span>+50 pontos</span></p></div><button class="arrow" type="button" aria-label="Detalhes da missão">›</button>
-          </article>
-          <article class="mission-card" data-search="compartilhe experiência feed postagem">
-            <div class="mission-icon pink" aria-hidden="true">•••</div>
-            <div class="mission-description"><h3>Compartilhe sua experiência</h3><p>Faça uma postagem no feed sobre um<br>lugar que você visitou.</p>
-              <div class="mission-progress"><span style="width:0%"></span></div><small class="count">0/1</small>
-            </div>
-            <div class="mission-reward"><b>✦ <span>+150 XP</span></b><p>◉ <span>+75 pontos</span></p></div><button class="arrow" type="button" aria-label="Detalhes da missão">›</button>
-          </article>
-          <article class="mission-card" data-search="happy hour bar horário">
-            <div class="mission-icon yellow" aria-hidden="true">♜</div>
-            <div class="mission-description"><h3>Happy Hour</h3><p>Visite um bar durante o horário de Happy Hour<br>(17h às 20h).</p>
-              <div class="mission-progress"><span style="width:0%"></span></div><small class="count">0/1</small>
-            </div>
-            <div class="mission-reward"><b>✦ <span>+200 XP</span></b><p>◉ <span>+100 pontos</span></p></div><button class="arrow" type="button" aria-label="Detalhes da missão">›</button>
-          </article>
-          <article class="mission-card" data-search="música ao vivo apresentação show">
-            <div class="mission-icon red" aria-hidden="true">♫</div>
-            <div class="mission-description"><h3>Música ao vivo</h3><p>Assista a uma apresentação de música ao vivo<br>em um dos estabelecimentos.</p>
-              <div class="mission-progress"><span style="width:0%"></span></div><small class="count">0/1</small>
-            </div>
-            <div class="mission-reward"><b>✦ <span>+250 XP</span></b><p>◉ <span>+150 pontos</span></p></div><button class="arrow" type="button" aria-label="Detalhes da missão">›</button>
-          </article>
-          <article class="mission-card" data-search="chame amigos convite">
-            <div class="mission-icon violet" aria-hidden="true">♧</div>
-            <div class="mission-description"><h3>Chame os amigos</h3><p>Convide 2 amigos para o InBar e ganhe<br>pontos extras.</p>
-              <div class="mission-progress"><span style="width:0%"></span></div><small class="count">0/2</small>
-            </div>
-            <div class="mission-reward"><b>✦ <span>+300 XP</span></b><p>◉ <span>+200 pontos</span></p></div><button class="arrow" type="button" aria-label="Detalhes da missão">›</button>
-          </article>
+          <div class="mission-filter-row" role="group" aria-label="Filtrar desafios por categoria">
+            <button class="mission-filter selected" type="button" data-category="Todas" aria-pressed="true">Todas</button>
+            <button class="mission-filter" type="button" data-category="Exploração" aria-pressed="false">Exploração</button>
+            <button class="mission-filter" type="button" data-category="Social" aria-pressed="false">Social</button>
+            <button class="mission-filter" type="button" data-category="Gastronomia" aria-pressed="false">Gastronomia</button>
+            <button class="mission-filter" type="button" data-category="Música" aria-pressed="false">Música</button>
+            <button class="mission-filter" type="button" data-category="Eventos" aria-pressed="false">Eventos</button>
+          </div>
+
+          <section class="missions-list" id="missionsList" aria-label="Desafios de demonstração">
+            <article class="mission-card" data-categories="Exploração" data-search="explore bairro estabelecimentos bares lugares">
+              <div class="mission-card-top">
+                <span class="mission-icon"><svg class="icon" aria-hidden="true"><use href="assets/icons.svg#map-pin"></use></svg></span>
+                <span class="mission-status">Prévia</span>
+              </div>
+              <p class="mission-category">EXPLORAÇÃO</p>
+              <h3>Explore o bairro</h3>
+              <p class="mission-description">Descubra diferentes lugares e conheça melhor a região ao seu redor.</p>
+              <div class="mission-card-footer"><span>Progresso indisponível</span><button class="mission-open" type="button">Ver desafio <span aria-hidden="true">→</span></button></div>
+            </article>
+            <article class="mission-card" data-categories="Social" data-search="compartilhe experiência feed postagem social">
+              <div class="mission-card-top">
+                <span class="mission-icon"><svg class="icon" aria-hidden="true"><use href="assets/icons.svg#images"></use></svg></span>
+                <span class="mission-status">Prévia</span>
+              </div>
+              <p class="mission-category">SOCIAL</p>
+              <h3>Compartilhe sua experiência</h3>
+              <p class="mission-description">Conte no feed sobre um lugar que fez parte do seu rolê.</p>
+              <div class="mission-card-footer"><span>Progresso indisponível</span><button class="mission-open" type="button">Ver desafio <span aria-hidden="true">→</span></button></div>
+            </article>
+            <article class="mission-card" data-categories="Gastronomia" data-search="happy hour bar horário gastronomia">
+              <div class="mission-card-top">
+                <span class="mission-icon"><svg class="icon" aria-hidden="true"><use href="assets/icons.svg#beer"></use></svg></span>
+                <span class="mission-status">Prévia</span>
+              </div>
+              <p class="mission-category">GASTRONOMIA</p>
+              <h3>Happy Hour</h3>
+              <p class="mission-description">Encontre um bar para aproveitar o fim de tarde com os amigos.</p>
+              <div class="mission-card-footer"><span>Progresso indisponível</span><button class="mission-open" type="button">Ver desafio <span aria-hidden="true">→</span></button></div>
+            </article>
+            <article class="mission-card" data-categories="Música Eventos" data-search="música ao vivo apresentação show música eventos">
+              <div class="mission-card-top">
+                <span class="mission-icon"><svg class="icon" aria-hidden="true"><use href="assets/icons.svg#music-2"></use></svg></span>
+                <span class="mission-status">Prévia</span>
+              </div>
+              <p class="mission-category">MÚSICA</p>
+              <h3>Música ao vivo</h3>
+              <p class="mission-description">Descubra uma apresentação ao vivo em um lugar da cidade.</p>
+              <div class="mission-card-footer"><span>Progresso indisponível</span><button class="mission-open" type="button">Ver desafio <span aria-hidden="true">→</span></button></div>
+            </article>
+            <article class="mission-card" data-categories="Social" data-search="chame amigos convite eventos social">
+              <div class="mission-card-top">
+                <span class="mission-icon"><svg class="icon" aria-hidden="true"><use href="assets/icons.svg#users-round"></use></svg></span>
+                <span class="mission-status">Prévia</span>
+              </div>
+              <p class="mission-category">EVENTOS</p>
+              <h3>Chame os amigos</h3>
+              <p class="mission-description">Compartilhe um convite e descubra novas experiências em grupo.</p>
+              <div class="mission-card-footer"><span>Progresso indisponível</span><button class="mission-open" type="button">Ver desafio <span aria-hidden="true">→</span></button></div>
+            </article>
+            <p class="missions-empty" id="missionsEmpty" hidden>Nenhum desafio encontrado. Experimente outra categoria ou busca.</p>
+          </section>
         </section>
 
-        <aside class="right-column">
+        <aside class="missions-side-column">
           <section class="side-panel achievements">
-            <h2><span aria-hidden="true">♜</span> Suas conquistas</h2>
-            <div class="achievement-grid">
-              <div class="achievement purple"><div aria-hidden="true">☆</div><small>Explorador</small></div>
-              <div class="achievement teal"><div aria-hidden="true">♙</div><small>Local Expert</small></div>
-              <div class="achievement yellow"><div aria-hidden="true">♜</div><small>Happy Hour</small></div>
-              <div class="achievement red"><div aria-hidden="true">♫</div><small>Música Lover</small></div>
-              <div class="achievement purple"><div aria-hidden="true">♧</div><small>Amigo do InBar</small></div>
-              <div class="achievement locked"><div aria-hidden="true">♙</div><small>Em breve</small></div>
+            <div class="side-panel-heading">
+              <span class="side-panel-icon"><svg class="icon" aria-hidden="true"><use href="assets/icons.svg#star"></use></svg></span>
+              <div><h2>Conquistas</h2><p>Seu próximo marco começa aqui.</p></div>
+            </div>
+            <div class="achievement-empty">
+              <span aria-hidden="true"><svg class="icon"><use href="assets/icons.svg#ellipsis"></use></svg></span>
+              <p>As conquistas aparecem aqui quando o progresso estiver integrado.</p>
             </div>
           </section>
           <section class="side-panel rewards">
-            <h2><span aria-hidden="true">♔</span> Recompensas</h2>
-            <div class="reward-row"><i aria-hidden="true">◇</i><div><b>Descontos exclusivos</b><small>Em bares e eventos</small></div><span aria-hidden="true">›</span></div>
-            <div class="reward-row"><i aria-hidden="true">♕</i><div><b>Acesso VIP</b><small>Eventos especiais</small></div><span aria-hidden="true">›</span></div>
-            <div class="reward-row"><i aria-hidden="true">☆</i><div><b>Pontos no app</b><small>Troque por benefícios</small></div><span aria-hidden="true">›</span></div>
-            <div class="reward-row"><i aria-hidden="true">♔</i><div><b>Sorteios mensais</b><small>Prêmios incríveis</small></div><span aria-hidden="true">›</span></div>
+            <div class="side-panel-heading">
+              <span class="side-panel-icon"><svg class="icon" aria-hidden="true"><use href="assets/icons.svg#ticket-percent"></use></svg></span>
+              <div><h2>Recompensas</h2><p>Benefícios vinculados às missões.</p></div>
+            </div>
+            <div class="rewards-preview">
+              <span aria-hidden="true"><svg class="icon"><use href="assets/icons.svg#ticket-percent"></use></svg></span>
+              <div><strong>Em preparação</strong><small>As recompensas serão apresentadas quando o sistema estiver disponível.</small></div>
+            </div>
           </section>
         </aside>
       </div>
@@ -183,17 +347,12 @@
     <div class="modal-backdrop" id="missionModal" aria-hidden="true">
       <section class="mission-modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
         <button class="modal-close" id="modalClose" type="button" aria-label="Fechar">×</button>
-        <div class="modal-icon" id="modalIcon" aria-hidden="true">☆</div>
-        <p class="modal-kicker">DETALHES DA MISSÃO</p>
+        <div class="modal-icon" id="modalIcon" aria-hidden="true"></div>
+        <p class="modal-kicker" id="modalCategory">DESAFIO INBAR</p>
         <h2 id="modalTitle">Nome da missão</h2>
         <p id="modalDescription" class="modal-description"></p>
-        <div class="modal-rewards" id="modalRewards"></div>
-        <div class="modal-progress-wrap">
-          <div class="modal-progress"><span id="modalProgressBar"></span></div>
-          <small id="modalCount">0/1 concluído</small>
-        </div>
-        <button class="modal-action" id="modalAction" type="button">Registrar progresso</button>
-        <p class="modal-note">Demonstração: o progresso fica apenas nesta página.</p>
+        <p class="modal-note">Esta missão é uma prévia. O acompanhamento e as recompensas ainda não estão disponíveis.</p>
+        <button class="modal-action" id="modalAction" type="button">Voltar às missões</button>
       </section>
     </div>
   </main>
@@ -399,5 +558,7 @@
   <script src="js/place-card.js"></script>
   <script src="js/app.js"></script>
   <script src="js/missions.js"></script>
+  <script src="../feed/Inbar/data.js"></script>
+  <script src="js/feed.js"></script>
 </body>
 </html>

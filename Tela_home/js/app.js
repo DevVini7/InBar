@@ -2,7 +2,7 @@ const places = window.inbarPlaces;
 let selectedId = null;
 let activeFilter = "Todos";
 let activePage = "Mapa";
-let mapSearchValue = "";
+const searchValues = { Mapa: "", Explorar: "", Feed: "", Missões: "" };
 let toastTimer;
 
 function showToast(message) {
@@ -15,6 +15,16 @@ function showToast(message) {
 
 function normalizeText(value) {
   return value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLocaleLowerCase("pt-BR");
+}
+
+function escapeHtml(value) {
+  return String(value).replace(/[&<>"']/g, character => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;"
+  })[character]);
 }
 
 function getVisiblePlaces() {
@@ -30,7 +40,7 @@ function getVisiblePlaces() {
 function renderSearchResults() {
   const input = document.getElementById("searchInput");
   const results = document.getElementById("searchResults");
-  if (activePage === "Missões") {
+  if (activePage !== "Mapa") {
     results.classList.add("hidden");
     results.replaceChildren();
     input.setAttribute("aria-expanded", "false");
@@ -124,7 +134,7 @@ function applyFilter(button) {
 
 function submitSearch(event) {
   event.preventDefault();
-  if (activePage === "Missões") return;
+  if (activePage !== "Mapa") return;
   const query = document.getElementById("searchInput").value.trim();
   const firstPlace = getVisiblePlaces()[0];
   if (!firstPlace) {
@@ -140,9 +150,16 @@ function submitSearch(event) {
 }
 
 function updateSearchResults() {
-  if (activePage === "Missões") return;
   const query = document.getElementById("searchInput").value;
   document.getElementById("clearSearch").style.display = query ? "block" : "none";
+  if (activePage !== "Mapa") {
+    const results = document.getElementById("searchResults");
+    results.classList.add("hidden");
+    results.replaceChildren();
+    document.getElementById("searchInput").setAttribute("aria-expanded", "false");
+    if (activePage === "Explorar") renderExplore();
+    return;
+  }
   const visiblePlaces = getVisiblePlaces();
   if (!visiblePlaces.length || !visiblePlaces.some(place => place.id === selectedId)) hideSelectedPlace();
   else renderMarkers();
@@ -152,37 +169,37 @@ function updateSearchResults() {
 function clearSearch() {
   const searchInput = document.getElementById("searchInput");
   searchInput.value = "";
-  document.getElementById("clearSearch").style.display = "none";
-  if (activePage === "Missões") {
-    searchInput.dispatchEvent(new Event("input", { bubbles: true }));
-    searchInput.focus();
-    return;
-  }
-  renderSearchResults();
-  renderMarkers();
+  searchValues[activePage] = "";
+  searchInput.dispatchEvent(new Event("input", { bubbles: true }));
+  if (activePage === "Mapa") renderMarkers();
   searchInput.focus();
 }
 
 function setActivePage(page, updateHistory = true) {
-  if (page !== "Mapa" && page !== "Missões") return;
+  if (!Object.prototype.hasOwnProperty.call(searchValues, page)) return;
   if (page === activePage) {
     if (page === "Mapa") window.InbarMap.resetView();
     return;
   }
 
   const searchInput = document.getElementById("searchInput");
-  if (page === "Missões") {
-    mapSearchValue = searchInput.value;
-    searchInput.value = "";
-  }
+  searchValues[activePage] = searchInput.value;
   activePage = page;
+  searchInput.value = searchValues[page];
   searchInput.dispatchEvent(new Event("input", { bubbles: true }));
 
+  const mapVisible = page === "Mapa";
+  const exploreVisible = page === "Explorar";
+  const feedVisible = page === "Feed";
   const missionsVisible = page === "Missões";
-  document.querySelector(".map-shell").classList.toggle("hidden", missionsVisible);
+  document.querySelector(".map-shell").classList.toggle("hidden", !mapVisible);
+  document.getElementById("exploreView").classList.toggle("hidden", !exploreVisible);
+  document.getElementById("feedView").classList.toggle("hidden", !feedVisible);
   document.getElementById("missionsView").classList.toggle("hidden", !missionsVisible);
-  searchInput.placeholder = missionsVisible ? "Buscar missões..." : "Buscar lugares, bairros...";
-  document.title = missionsVisible ? "InBar — Missões" : "Inbar — Mapa";
+  searchInput.placeholder = missionsVisible ? "Buscar missões..."
+    : feedVisible ? "Buscar publicações e lugares..."
+      : "Buscar lugares, bairros...";
+  document.title = `InBar — ${page}`;
   document.getElementById("clearSearch").style.display = "";
   document.getElementById("searchResults").classList.add("hidden");
   searchInput.setAttribute("aria-expanded", "false");
@@ -191,17 +208,68 @@ function setActivePage(page, updateHistory = true) {
     link.classList.toggle("active", link.dataset.page === page);
   });
 
-  if (!missionsVisible) {
-    searchInput.value = mapSearchValue;
-    searchInput.dispatchEvent(new Event("input", { bubbles: true }));
-    document.getElementById("searchResults").classList.add("hidden");
-    searchInput.setAttribute("aria-expanded", "false");
+  if (mapVisible) {
     window.requestAnimationFrame(() => window.InbarMap.invalidateSize());
   }
 
   if (updateHistory) {
-    window.history.pushState({ page }, "", missionsVisible ? "#missions" : "#");
+    const route = { "Mapa": "", "Explorar": "#explorar", "Feed": "#feed", "Missões": "#missions" }[page];
+    window.history.pushState({ page }, "", route || "#");
   }
+}
+
+function renderExplore() {
+  const view = document.getElementById("exploreView");
+  const query = normalizeText(document.getElementById("searchInput").value.trim());
+  const matches = places.filter(place => {
+    const searchable = normalizeText(`${place.name} ${place.distance} ${place.desc} ${place.types.join(" ")} ${(place.searchTerms || []).join(" ")}`);
+    return !query || searchable.includes(query);
+  });
+  view.innerHTML = `<div class="explore-layout">
+    <header class="explore-heading">
+      <div><p class="feed-kicker">ENCONTRE SEU PRÓXIMO ROLÊ</p><h1>Explorar</h1><p>Descubra os lugares cadastrados no InBar e veja seus detalhes no mapa.</p></div>
+      <span class="explore-count">${matches.length} ${matches.length === 1 ? "lugar" : "lugares"}</span>
+    </header>
+    <section class="explore-grid" aria-label="Lugares cadastrados">
+      ${matches.map(place => `<article class="explore-card">
+        <img src="${escapeHtml(place.image)}" alt="" loading="lazy">
+        <div class="explore-card-body">
+          <div class="explore-card-title"><h2>${escapeHtml(place.name)}</h2><span>${escapeHtml(place.category)}</span></div>
+          <p>${escapeHtml(place.desc)}</p>
+          <div class="explore-tags">${place.types.map(type => `<span>${escapeHtml(type)}</span>`).join("")}</div>
+          <button type="button" class="explore-place-button" data-open-place="${escapeHtml(place.id)}">Ver no mapa <span aria-hidden="true">→</span></button>
+        </div>
+      </article>`).join("")}
+      ${matches.length ? "" : '<p class="explore-empty">Nenhum lugar encontrado. Tente outra busca.</p>'}
+    </section>
+  </div>`;
+}
+
+function routeFromHash() {
+  const route = window.location.hash.replace(/^#\/?/, "").toLocaleLowerCase("pt-BR");
+  return route === "missions" || route === "feed" || route === "explorar" ? {
+    missions: "Missões",
+    feed: "Feed",
+    explorar: "Explorar"
+  }[route] : "Mapa";
+}
+
+function setupProfile() {
+  const currentUser = window.InbarAuth.getCurrentUser();
+  if (!currentUser) {
+    window.location.replace("login.html");
+    return;
+  }
+
+  const fullName = typeof currentUser.fullName === "string" && currentUser.fullName.trim()
+    ? currentUser.fullName.trim()
+    : "Usuário";
+  const email = typeof currentUser.email === "string" ? currentUser.email : "";
+  document.getElementById("profileTriggerName").textContent = fullName;
+  document.getElementById("profileFullName").textContent = fullName;
+  document.getElementById("profileEmail").textContent = email;
+  document.getElementById("profileEmail").hidden = !email;
+  document.getElementById("profileButton").setAttribute("aria-label", `Abrir perfil de ${fullName}`);
 }
 
 function closeProfileMenu() {
@@ -231,7 +299,9 @@ function togglePlaceDetails() {
 
 function showPlaceFeed() {
   const place = places.find(item => item.id === selectedId);
-  if (place) showToast(`Feed de ${place.name} — demonstração.`);
+  if (!place) return;
+  setActivePage("Feed");
+  if (window.InbarFeed) window.InbarFeed.filterByPlace(place.id);
 }
 
 function setupEvents() {
@@ -247,31 +317,37 @@ function setupEvents() {
   document.getElementById("nextPlace").addEventListener("click", showNextPlace);
   document.getElementById("closeCard").addEventListener("click", hideSelectedPlace);
   document.getElementById("detailsButton").addEventListener("click", togglePlaceDetails);
-  document.getElementById("allPosts").addEventListener("click", () => showToast("Feed de publicações demonstrativo."));
+  document.getElementById("allPosts").addEventListener("click", () => setActivePage("Feed"));
   document.getElementById("feedButton").addEventListener("click", showPlaceFeed);
   document.getElementById("directionsButton").addEventListener("click", window.InbarPlaceCard.toggleNavigationOptions);
   document.querySelectorAll(".nav-link").forEach(button => {
     button.addEventListener("click", () => {
-      const page = button.dataset.page;
-      if (page === "Missões" || page === "Mapa") {
-        setActivePage(page);
-        return;
-      }
-      document.querySelectorAll(".nav-link").forEach(link => link.classList.remove("active"));
-      button.classList.add("active");
-      showToast(`${page}: seção demonstrativa. A navegação pode ser conectada à página correspondente.`);
+      setActivePage(button.dataset.page);
     });
   });
+  document.getElementById("exploreView").addEventListener("click", event => {
+    const button = event.target.closest("[data-open-place]");
+    if (button) window.InbarNavigation.openPlace(Number(button.dataset.openPlace));
+  });
   document.querySelector(".brand").addEventListener("click", event => {
-    if (activePage === "Missões") {
+    if (activePage !== "Mapa") {
       event.preventDefault();
       setActivePage("Mapa");
     }
   });
-  window.addEventListener("popstate", () => {
-    setActivePage(window.location.hash === "#missions" ? "Missões" : "Mapa", false);
-  });
+  const syncNavigation = () => setActivePage(routeFromHash(), false);
+  window.addEventListener("popstate", syncNavigation);
+  window.addEventListener("hashchange", syncNavigation);
   document.getElementById("profileButton").addEventListener("click", toggleProfileMenu);
+  document.getElementById("signOutButton").addEventListener("click", () => {
+    try {
+      window.InbarAuth.logout();
+      window.location.replace("login.html");
+    } catch (error) {
+      console.error("Não foi possível encerrar a sessão do InBar.", error);
+      showToast("Não foi possível sair. Verifique o armazenamento do navegador e tente novamente.");
+    }
+  });
   document.getElementById("editPreferences").addEventListener("click", () => {
     closeProfileMenu();
     window.location.assign("./onboarding.html?mode=edit");
@@ -294,10 +370,22 @@ function setupEvents() {
   });
 }
 
+window.InbarNavigation = {
+  navigateTo: setActivePage,
+  openPlace(id) {
+    if (!places.some(place => place.id === id)) return;
+    setActivePage("Mapa");
+    window.requestAnimationFrame(() => {
+      if (activePage === "Mapa") selectPlace(id, true);
+    });
+  }
+};
+
+setupProfile();
 window.InbarMap.init({
   onPlaceSelect: selectPlace,
   onError: showToast
 });
 setupEvents();
 renderMarkers();
-if (window.location.hash === "#missions") setActivePage("Missões", false);
+if (window.location.hash) setActivePage(routeFromHash(), false);

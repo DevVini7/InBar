@@ -100,18 +100,18 @@ input:focus-visible {
   display: inline-flex;
   width: fit-content;
   align-items: center;
-  gap: 7px;
+  gap: 12px;
 }
 
 .brand-icon {
-  width: 48px;
-  height: 48px;
+  width: 76px;
+  height: 76px;
   object-fit: contain;
 }
 
 .brand-wordmark {
-  width: 106px;
-  height: 49px;
+  width: 150px;
+  height: 68px;
   overflow: visible;
 }
 
@@ -542,13 +542,13 @@ input:focus-visible {
   }
 
   .brand-icon {
-    width: 42px;
-    height: 42px;
+    width: 62px;
+    height: 62px;
   }
 
   .brand-wordmark {
-    width: 94px;
-    height: 44px;
+    width: 124px;
+    height: 58px;
   }
 
   .intro-copy .eyebrow {

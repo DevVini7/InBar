@@ -37,6 +37,8 @@
     document.getElementById("welcomeTitle").textContent = "Seus interesses, do seu jeito";
     document.getElementById("welcomeDescription").textContent = "Atualize suas escolhas para deixar as descobertas do InBar ainda mais alinhadas com você.";
     skipButton.textContent = "Cancelar edição";
+  } else {
+    skipButton.textContent = "Sair sem concluir";
   }
 
   function renderCategories() {
@@ -228,7 +230,13 @@
       window.location.assign("./index.html");
       return;
     }
-    saveAndReturn([], []);
+    try {
+      window.InbarAuth.logout();
+      window.location.replace("./login.html");
+    } catch (error) {
+      console.error("Não foi possível encerrar a sessão do InBar.", error);
+      status.textContent = "Não foi possível sair. Verifique o armazenamento do navegador e tente novamente.";
+    }
   });
 
   render();

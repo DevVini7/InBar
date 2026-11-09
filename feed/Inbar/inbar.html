@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0b0712">
+  <meta name="description" content="Descubra o que está acontecendo nos bares, lounges e restaurantes de Brasília.">
+  <title>inbar - Feed ao Vivo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
+  <script src="data.js" defer></script>
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <!-- Cabeçalho e rotas para as áreas da demonstração. -->
+  <header class="topbar">
+    <a class="brand" href="#/inicio" aria-label="Inbar, página inicial">
+      <span class="brand-mark"><i class="fa-solid fa-location-dot" aria-hidden="true"></i></span>
+      <span class="brand-name">inbar</span>
+    </a>
+    <nav class="main-nav" aria-label="Navegação principal">
+      <a class="nav-link" data-nav="mapa" href="#/mapa">Mapa</a>
+      <a class="nav-link" data-nav="explorar" href="#/explorar">Explorar</a>
+      <a class="nav-link" data-nav="feed" href="#/feed">Feed</a>
+      <a class="nav-link" data-nav="missoes" href="#/missoes">Missões</a>
+    </nav>
+    <div class="header-actions">
+      <label class="search-wrap">
+        <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+        <input id="search-input" class="search-input" type="search" placeholder="Buscar publicações, lugares..." aria-label="Buscar publicações e estabelecimentos">
+      </label>
+      <a class="profile-button" href="#/perfil/inbar-adm" aria-label="Abrir perfil ADM INBAR">
+        <img src="assets/adm-inbar-perfil.jpg" alt="ADM INBAR, perfil administrativo">
+      </a>
+    </div>
+  </header>
+
+  <nav class="mobile-nav" aria-label="Navegação móvel">
+    <a class="nav-link" data-nav="mapa" href="#/mapa">Mapa</a>
+    <a class="nav-link" data-nav="explorar" href="#/explorar">Explorar</a>
+    <a class="nav-link" data-nav="feed" href="#/feed">Feed</a>
+    <a class="nav-link" data-nav="missoes" href="#/missoes">Missões</a>
+  </nav>
+
+  <!-- O conteúdo é renderizado por app.js conforme a rota selecionada. -->
+  <main id="app-view" class="page-shell" tabindex="-1"></main>
+
+  <!-- Janela de criação de publicação. -->
+  <dialog id="publish-dialog" class="dialog" aria-labelledby="publish-title">
+    <div class="dialog-header">
+      <h2 id="publish-title">Compartilhe sua experiência</h2>
+      <button class="close-button" type="button" data-close-dialog aria-label="Fechar"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <form id="publish-form" class="dialog-body">
+      <div class="form-field">
+        <label for="post-message-input">O que está acontecendo?</label>
+        <textarea id="post-message-input" class="form-control" maxlength="280" placeholder="Conte um pouco da sua noite..." required></textarea>
+      </div>
+      <div class="form-field">
+        <label for="venue-select">Estabelecimento</label>
+        <select id="venue-select" class="form-control" required></select>
+      </div>
+      <div class="form-field">
+        <label for="post-image">Fotografia (opcional, até 5 MB)</label>
+        <div class="upload-control"><i class="fa-regular fa-image"></i><input id="post-image" type="file" accept="image/*"></div>
+        <img id="image-preview" class="image-preview" alt="Prévia da fotografia escolhida">
+      </div>
+      <p class="privacy-note" style="padding:0">Publicação demonstrativa: ficará disponível apenas nesta sessão do navegador.</p>
+      <div class="dialog-actions">
+        <button class="button button-quiet" type="button" data-close-dialog>Cancelar</button>
+        <button class="button button-primary" type="submit"><i class="fa-solid fa-paper-plane"></i>Publicar</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Janela de leitura e envio de comentários. -->
+  <dialog id="comments-dialog" class="dialog" aria-labelledby="comments-title">
+    <div class="dialog-header">
+      <h2 id="comments-title">Comentários</h2>
+      <button class="close-button" type="button" data-close-dialog aria-label="Fechar"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="dialog-body">
+      <section id="comments-list" class="comments-list" aria-live="polite"></section>
+      <form id="comment-form" class="comment-form">
+        <label class="sr-only" for="comment-input">Escreva um comentário</label>
+        <input id="comment-input" class="form-control" type="text" maxlength="240" placeholder="Escreva um comentário..." required>
+        <button class="button button-primary" type="submit" aria-label="Enviar comentário"><i class="fa-solid fa-paper-plane"></i></button>
+      </form>
+    </div>
+  </dialog>
+
+  <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+</body>
+</html>

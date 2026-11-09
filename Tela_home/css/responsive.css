@@ -98,6 +98,7 @@
   .search {
     height: 43px;
     width: auto;
+    min-width: 0;
     flex: 1;
     padding: 0 12px;
     gap: 7px;

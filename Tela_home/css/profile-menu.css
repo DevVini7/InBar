@@ -3,17 +3,92 @@
   flex: 0 0 auto;
 }
 
+.profile-trigger {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #f7f8ff;
+  cursor: pointer;
+}
+
+.profile-trigger-name {
+  max-width: 150px;
+  overflow: hidden;
+  color: #e7edf8;
+  font-size: 13px;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .profile-menu {
   position: absolute;
   z-index: 1100;
   top: calc(100% + 10px);
   right: 0;
-  width: 212px;
+  width: 260px;
   padding: 8px;
   border: 1px solid rgba(143, 157, 190, .22);
   border-radius: 14px;
   background: rgba(8, 10, 22, .98);
   box-shadow: 0 14px 38px #0009, 0 0 24px #8c12ff20;
+}
+
+.profile-menu-identity {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  min-width: 0;
+  padding: 7px 8px 10px;
+}
+
+.profile-menu-avatar {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 1px solid rgba(143, 157, 190, .26);
+  border-radius: 50%;
+  background: #101525;
+  color: #fff;
+}
+
+.profile-menu .profile-menu-avatar .icon {
+  width: 22px;
+  height: 22px;
+  color: #fff;
+}
+
+.profile-menu-user-details {
+  display: grid;
+  min-width: 0;
+  gap: 4px;
+}
+
+.profile-menu-user-details strong,
+.profile-menu-user-details small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.profile-menu-user-details strong {
+  color: #f7f8ff;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.profile-menu-user-details small {
+  color: #9ba6bf;
+  font-size: 11px;
+}
+
+.profile-menu-user-details small[hidden] {
+  display: none;
 }
 
 .profile-menu-title {
@@ -58,4 +133,10 @@
 
 .profile-menu .profile-sign-out {
   color: #ff9aab;
+}
+
+@media (max-width: 760px) {
+  .profile-trigger-name {
+    display: none;
+  }
 }

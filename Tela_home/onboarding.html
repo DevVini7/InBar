@@ -8,7 +8,22 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/onboarding.css">
+  <script src="js/auth.js"></script>
   <script src="js/interests.js"></script>
+  <script>
+    try {
+      const currentUser = window.InbarAuth.getCurrentUser();
+      const editingPreferences = new URLSearchParams(window.location.search).get("mode") === "edit";
+      if (!currentUser) {
+        window.location.replace("login.html");
+      } else if (!editingPreferences && !window.InbarInterests.requiresOnboarding()) {
+        window.location.replace("index.html");
+      }
+    } catch (error) {
+      console.error("Não foi possível verificar o acesso à personalização do InBar.", error);
+      window.location.replace("login.html");
+    }
+  </script>
 </head>
 <body class="onboarding-page">
   <header class="onboarding-header">

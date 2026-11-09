@@ -11,6 +11,7 @@ Projeto front-end em HTML, CSS e JavaScript. O mapa usa Leaflet e tiles cartogr�
 - `js/place-card.js`: conteúdo e expansão do cartão de detalhes na HOME.
 - `js/app.js`: filtros, busca e eventos da interface.
 - `js/interests.js`: catálogo de interesses, persistência de preferências e pontuação de compatibilidade para recomendações.
+- `js/auth.js`: sessão de teste por aba e perfis locais usados para identificar cada usuário.
 - `js/login.js`: validação de login/cadastro em modo de teste e navegação para a HOME.
 - `js/onboarding.js`, `onboarding.html` e `css/onboarding.css`: fluxo responsivo de seleção e edição das preferências.
 - `assets/icons.svg`: coleção local de ícones SVG Lucide, reutilizada pela HOME sem API ou CDN.
@@ -23,6 +24,8 @@ Projeto front-end em HTML, CSS e JavaScript. O mapa usa Leaflet e tiles cartogr�
 - `css/responsive.css`: ajustes para tablets e celulares.
 - `css/missions.css`: estilos isolados da tela de Missões.
 - `js/missions.js`: filtros, busca, detalhes e progresso demonstrativo das missões.
+- `css/feed.css` e `js/feed.js`: estilos e interações do Feed integrado, com filtros, publicações, curtidas, comentários e descoberta de locais.
+- `../feed/Inbar/data.js`: conteúdo de exemplo recebido para o Feed; são exibidas somente publicações que correspondem a locais existentes em `js/places.js`.
 - `missions.html`: atalho que abre a tela integrada em `index.html#missions`; `missoes/index.html` mantém o caminho antigo como redirecionamento.
 
 ## Fluxo inicial
@@ -41,10 +44,12 @@ Abra `index.html` na raiz do projeto para iniciar no login. Após enviar credenc
 - Filtros por bares, boates, música ao vivo, eventos, happy hour e hobbies; a busca sugere lugares e aceita nomes, regiões e termos relacionados, sem diferenciar acentos.
 - Marcadores com ícones SVG Lucide distintos para bares, boates, música ao vivo, eventos, boliche e karaokê; o mapa enquadra os pontos cadastrados e ancora cada pin na coordenada do local.
 - Menu visual de perfil com acesso à edição de preferências; as demais opções continuam demonstrativas.
-- Onboarding de interesses no primeiro acesso, com edição pelo menu de perfil e armazenamento versionado em `localStorage`. O projeto não possui autenticação ou backend; neste protótipo, as preferências são associadas a um identificador anônimo persistente no navegador.
-- A autenticação fica em `login.html`, com estilos em `css/login.css` e lógica em `js/login.js`. Em modo de teste, qualquer e-mail válido e senha permitem seguir para `index.html`, que encaminha ao onboarding se necessário. O cadastro válido exibe uma confirmação, mas não cria nem armazena uma conta; não há autenticação real ou sessão persistente.
+- Onboarding de interesses no primeiro acesso, com edição pelo menu de perfil e armazenamento versionado em `localStorage`. As preferências ficam separadas pelo identificador do perfil autenticado no protótipo; o modo anônimo permanece apenas como fallback para páginas sem sessão.
+- A autenticação de demonstração fica em `login.html`, com estilos em `css/login.css`, lógica de formulário em `js/login.js` e sessão/perfis em `js/auth.js`. Qualquer e-mail válido e senha não vazia são aceitos para teste. Os perfis registrados e as preferências são separados por usuário; a sessão é removida ao sair. Não há servidor nem verificação segura de credenciais, e senhas não são armazenadas.
 - Metadados de recomendação nos locais existentes no formato `interests: { categoryIds, tags }`. `InbarInterests.getCompatibilityScore()` retorna uma pontuação de 0 a 100; `rankEntities()` retorna pares `{ entity, score }` para preparar recomendações no Feed e em Explorar, sem reordenar nem filtrar os marcadores do mapa. Categorias têm peso 1 e tags específicas peso 2.
 - Tela de Missões integrada à navegação: use "Missões" no cabeçalho; retorne pelo botão "Mapa", pela marca ou pelo histórico do navegador. A busca global filtra missões enquanto essa tela está aberta.
+- Feed integrado à navegação compartilhada: use "Feed", filtre por categoria ou autor, curta, comente, compartilhe ou crie publicações associadas a um local do catálogo. No protótipo, publicações e interações são armazenadas no `localStorage` deste navegador e associadas à sessão de teste; ainda não há sincronização por servidor. O conteúdo de exemplo fornecido na pasta `feed/` é identificado na tela e não representa atividade real.
+- Explorar integrado à navegação: os cartões são gerados a partir dos locais do mapa e permitem abrir os detalhes do estabelecimento no mapa.
 - Geolocalização do navegador (requer permissão; em geral funciona em localhost ou HTTPS) posicionada sobre o mapa real.
 - Layout adaptável para desktop e celular.
 
@@ -61,5 +66,5 @@ Abra `index.html` na raiz do projeto para iniciar no login. Após enviar credenc
 
 ## Observações
 - Os bares, boates, atividades, eventos, avaliações, ofertas, números de ocupação, fotos, perfis e publicações são dados fictícios de demonstração; nomes e regiões de alguns locais foram informados pelo usuário ou conferidos em listagens públicas. As coordenadas continuam aproximadas e não representam endereços exatos nem movimento real. Trem Bão está indicado em Lago Norte; os pontos da orla ficam em terra, perto do Lago Paranoá, nunca sobre a água.
-- As abas Explorar e Feed ainda têm interação visual demonstrativa. Missões é exibida no mesmo layout compartilhado da HOME, sem repetir o cabeçalho, o perfil ou os controles do mapa.
+- Feed e Explorar usam o cabeçalho, perfil e navegação existentes; em telas pequenas, a própria navegação compartilhada fica acessível na base da tela quando uma dessas seções ou Missões está ativa.
 - Os dados cartográficos são do OpenStreetMap; a disponibilidade dos tiles depende do serviço e de suas políticas de uso. Consulte a atribuição exibida no mapa e [a política oficial de tiles](https://operations.osmfoundation.org/policies/tiles/).

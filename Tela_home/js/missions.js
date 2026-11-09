@@ -1,148 +1,109 @@
-(function () {
-const toast = document.getElementById("missionsToast");
-let toastTimer;
-let selectedCategory = "Todos";
-let selectedCard = null;
-let selectedIndex = -1;
-const searchInput = document.getElementById("searchInput");
-const missionCards = [...document.querySelectorAll(".mission-card")];
-const categoryMap = {
-  "Todos": [0, 1, 2, 3, 4],
-  "Bares": [0, 2],
-  "Eventos": [3],
-  "Música ao vivo": [3],
-  "Happy Hour": [2],
-  "Outros": [1, 4]
-};
+(() => {
+  const toast = document.getElementById("missionsToast");
+  const searchInput = document.getElementById("searchInput");
+  const missionCards = [...document.querySelectorAll(".mission-card")];
+  const categoryFilters = [...document.querySelectorAll(".mission-filter")];
+  const selectedCategory = { value: "Todas" };
+  const modal = document.getElementById("missionModal");
+  const modalTitle = document.getElementById("modalTitle");
+  const modalDescription = document.getElementById("modalDescription");
+  const modalIcon = document.getElementById("modalIcon");
+  const modalCategory = document.getElementById("modalCategory");
+  const modalAction = document.getElementById("modalAction");
+  let toastTimer;
+  let activeCard = null;
 
-function showToast(message) {
-  toast.textContent = message;
-  toast.classList.add("show");
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => toast.classList.remove("show"), 2300);
-}
-
-function normalizeText(value) {
-  return value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLocaleLowerCase("pt-BR");
-}
-
-function filterMissions() {
-  const term = normalizeText(searchInput.value.trim());
-  const visibleIndexes = categoryMap[selectedCategory] || categoryMap.Todos;
-  document.getElementById("clearSearch").style.display = searchInput.value ? "block" : "none";
-
-  missionCards.forEach((card, index) => {
-    const searchable = normalizeText(`${card.dataset.search} ${card.innerText}`);
-    card.hidden = !visibleIndexes.includes(index) || Boolean(term && !searchable.includes(term));
-  });
-
-  const heading = document.querySelector(".section-title h2");
-  heading.textContent = selectedCategory === "Todos" ? "Missões Ativas" : selectedCategory;
-  document.getElementById("missionsList").setAttribute(
-    "aria-label",
-    selectedCategory === "Todos" ? "Todas as missões" : `Missões da categoria ${selectedCategory}`
-  );
-}
-
-searchInput.addEventListener("input", filterMissions);
-document.querySelectorAll(".mission-filter").forEach(button => {
-  button.addEventListener("click", () => {
-    document.querySelectorAll(".mission-filter").forEach(item => item.classList.remove("selected"));
-    button.classList.add("selected");
-    selectedCategory = button.dataset.category;
-    filterMissions();
-    showToast(selectedCategory === "Todos"
-      ? "Exibindo todas as missões."
-      : `Exibindo missões relacionadas a: ${selectedCategory}.`);
-  });
-});
-
-const missionData = [
-  { progress: 1, goal: 3 },
-  { progress: 0, goal: 1 },
-  { progress: 0, goal: 1 },
-  { progress: 0, goal: 1 },
-  { progress: 0, goal: 2 }
-];
-
-const modal = document.getElementById("missionModal");
-const modalTitle = document.getElementById("modalTitle");
-const modalDescription = document.getElementById("modalDescription");
-const modalIcon = document.getElementById("modalIcon");
-const modalRewards = document.getElementById("modalRewards");
-const modalProgressBar = document.getElementById("modalProgressBar");
-const modalCount = document.getElementById("modalCount");
-const modalAction = document.getElementById("modalAction");
-
-function updateCard(index) {
-  const card = missionCards[index];
-  const data = missionData[index];
-  const count = card.querySelector(".count");
-  const bar = card.querySelector(".mission-progress span");
-  count.textContent = `${data.progress}/${data.goal}`;
-  bar.style.width = `${(data.progress / data.goal) * 100}%`;
-}
-
-function refreshModal() {
-  const data = missionData[selectedIndex];
-  modalProgressBar.style.width = `${(data.progress / data.goal) * 100}%`;
-  modalCount.textContent = `${data.progress}/${data.goal} concluído(s)`;
-  modalAction.disabled = data.progress >= data.goal;
-  modalAction.textContent = data.progress >= data.goal ? "Missão concluída ✓" : "Registrar progresso";
-}
-
-function openMission(card, index) {
-  selectedCard = card;
-  selectedIndex = index;
-  modalTitle.textContent = card.querySelector("h3").textContent;
-  modalDescription.textContent = card.querySelector(".mission-description p").innerText.replace(/\n/g, " ");
-  modalIcon.textContent = card.querySelector(".mission-icon").textContent.trim();
-  const reward = card.querySelector(".mission-reward");
-  const experience = document.createElement("strong");
-  const points = document.createElement("span");
-  experience.textContent = reward.querySelector("b").innerText.trim();
-  points.textContent = reward.querySelector("p").innerText.trim();
-  modalRewards.replaceChildren(experience, points);
-  refreshModal();
-  modal.classList.add("open");
-  modal.setAttribute("aria-hidden", "false");
-}
-
-missionCards.forEach((card, index) => {
-  card.setAttribute("tabindex", "0");
-  card.setAttribute("role", "button");
-  card.setAttribute("aria-label", `Ver detalhes: ${card.querySelector("h3").textContent}`);
-  card.addEventListener("click", () => openMission(card, index));
-  card.addEventListener("keydown", event => {
-    if (event.key === "Enter" || event.key === " ") {
-      event.preventDefault();
-      openMission(card, index);
-    }
-  });
-});
-
-modalAction.addEventListener("click", () => {
-  if (selectedIndex < 0) return;
-  const data = missionData[selectedIndex];
-  if (data.progress < data.goal) {
-    data.progress += 1;
-    updateCard(selectedIndex);
-    refreshModal();
-    if (data.progress >= data.goal) showToast("Missão concluída! Recompensa demonstrativa liberada.");
-    else showToast("Progresso atualizado!");
+  function showToast(message) {
+    toast.textContent = message;
+    toast.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toast.classList.remove("show"), 2300);
   }
-});
 
-function closeModal() {
-  modal.classList.remove("open");
-  modal.setAttribute("aria-hidden", "true");
-  selectedIndex = -1;
-  if (selectedCard) selectedCard.focus();
-  selectedCard = null;
-}
-document.getElementById("modalClose").addEventListener("click", closeModal);
-modal.addEventListener("click", event => { if (event.target === modal) closeModal(); });
-document.addEventListener("keydown", event => { if (event.key === "Escape") closeModal(); });
+  function normalizeText(value) {
+    return value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLocaleLowerCase("pt-BR");
+  }
 
-filterMissions();
+  function filterMissions() {
+    const term = normalizeText(searchInput.value.trim());
+    let visibleCount = 0;
+
+    missionCards.forEach(card => {
+      const categories = card.dataset.categories.split(" ");
+      const matchesCategory = selectedCategory.value === "Todas" || categories.includes(selectedCategory.value);
+      const searchable = normalizeText(`${card.dataset.search} ${card.innerText}`);
+      const matchesSearch = !term || searchable.includes(term);
+      card.hidden = !matchesCategory || !matchesSearch;
+      if (!card.hidden) visibleCount += 1;
+    });
+
+    document.getElementById("missionsEmpty").hidden = visibleCount > 0;
+    document.getElementById("missionCount").textContent =
+      `${visibleCount} ${visibleCount === 1 ? "prévia" : "prévias"}`;
+    document.getElementById("missionsList").setAttribute(
+      "aria-label",
+      selectedCategory.value === "Todas"
+        ? "Desafios de demonstração"
+        : `Desafios de demonstração: ${selectedCategory.value}`
+    );
+    document.getElementById("missionsSectionTitle").textContent =
+      selectedCategory.value === "Todas" ? "Desafios em prévia" : `Desafios · ${selectedCategory.value}`;
+  }
+
+  function closeModal() {
+    if (!modal.classList.contains("open")) return;
+    modal.classList.remove("open");
+    modal.setAttribute("aria-hidden", "true");
+    if (activeCard) activeCard.focus();
+    activeCard = null;
+  }
+
+  function openMission(card, button) {
+    activeCard = button;
+    modalTitle.textContent = card.querySelector("h3").textContent;
+    modalDescription.textContent = card.querySelector(".mission-description").textContent;
+    modalCategory.textContent = card.querySelector(".mission-category").textContent;
+    modalIcon.replaceChildren(card.querySelector(".mission-icon .icon").cloneNode(true));
+    modal.classList.add("open");
+    modal.setAttribute("aria-hidden", "false");
+    modalAction.focus();
+  }
+
+  categoryFilters.forEach(button => {
+    button.addEventListener("click", () => {
+      selectedCategory.value = button.dataset.category;
+      categoryFilters.forEach(filter => {
+        const selected = filter === button;
+        filter.classList.toggle("selected", selected);
+        filter.setAttribute("aria-pressed", String(selected));
+      });
+      filterMissions();
+      showToast(selectedCategory.value === "Todas"
+        ? "Exibindo todas as prévias."
+        : `Exibindo prévias de ${selectedCategory.value}.`);
+    });
+  });
+
+  missionCards.forEach(card => {
+    const button = card.querySelector(".mission-open");
+    button.addEventListener("click", () => openMission(card, button));
+  });
+
+  searchInput.addEventListener("input", filterMissions);
+  document.getElementById("modalClose").addEventListener("click", closeModal);
+  modalAction.addEventListener("click", closeModal);
+  modal.addEventListener("click", event => {
+    if (event.target === modal) closeModal();
+  });
+  document.addEventListener("keydown", event => {
+    if (event.key === "Escape") closeModal();
+  });
+
+  const currentUser = window.InbarAuth && window.InbarAuth.getCurrentUser();
+  const fullName = currentUser && typeof currentUser.fullName === "string" && currentUser.fullName.trim()
+    ? currentUser.fullName.trim()
+    : "Usuário";
+  document.getElementById("missionsUserName").textContent = fullName;
+
+  filterMissions();
 })();

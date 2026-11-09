@@ -142,6 +142,9 @@ window.InbarInterests = (() => {
     const currentUser = window.InbarAuth && typeof window.InbarAuth.getCurrentUser === "function"
       ? window.InbarAuth.getCurrentUser()
       : null;
+    if (currentUser && typeof currentUser.id === "string") {
+      return { userId: currentUser.id };
+    }
     let anonymousId = window.localStorage.getItem(ANONYMOUS_ID_KEY);
     if (!anonymousId) {
       const randomId = window.crypto && typeof window.crypto.randomUUID === "function"
@@ -150,10 +153,7 @@ window.InbarInterests = (() => {
       anonymousId = `guest-${randomId}`;
       window.localStorage.setItem(ANONYMOUS_ID_KEY, anonymousId);
     }
-    return {
-      userId: currentUser && typeof currentUser.id === "string" ? currentUser.id : null,
-      anonymousId
-    };
+    return { anonymousId };
   }
 
   function storageKey(identity) {

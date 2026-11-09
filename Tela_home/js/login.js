@@ -52,6 +52,14 @@
   };
   let isRegistration = false;
 
+  function redirectAuthenticatedUser() {
+    const currentUser = window.InbarAuth.getCurrentUser();
+    if (!currentUser) return false;
+    const destination = window.InbarInterests.requiresOnboarding() ? "onboarding.html" : "index.html";
+    window.location.replace(destination);
+    return true;
+  }
+
   function setFieldError(name, message) {
     const input = form.elements.namedItem(name);
     const error = document.getElementById(errorIds[name] || `${name}Error`);
@@ -196,13 +204,41 @@
     }
 
     if (isRegistration) {
-      formStatus.dataset.state = "info";
-      formStatus.textContent = "usuario cadastrado com sucesso.";
+      try {
+        window.InbarAuth.register({
+          fullName: form.elements.namedItem("fullName").value,
+          email: form.elements.namedItem("email").value,
+          ageConfirmed: form.elements.namedItem("ageConfirmation").checked
+        });
+        formStatus.dataset.state = "info";
+        formStatus.textContent = "usuario cadastrado com sucesso.";
+      } catch (error) {
+        console.error("Não foi possível concluir o cadastro de teste do InBar.", error);
+        formStatus.dataset.state = "error";
+        formStatus.textContent = error.message || "Não foi possível concluir o cadastro.";
+      }
       return;
     }
 
-    window.location.assign("index.html");
+    try {
+      window.InbarAuth.login(
+        form.elements.namedItem("email").value,
+        password.value
+      );
+      redirectAuthenticatedUser();
+    } catch (error) {
+      console.error("Não foi possível iniciar a sessão de teste do InBar.", error);
+      formStatus.dataset.state = "error";
+      formStatus.textContent = "Não foi possível entrar. Verifique o armazenamento do navegador e tente novamente.";
+    }
   });
 
   setMode(false);
+  try {
+    redirectAuthenticatedUser();
+  } catch (error) {
+    console.error("Não foi possível verificar o fluxo de acesso do InBar.", error);
+    formStatus.dataset.state = "error";
+    formStatus.textContent = "Não foi possível verificar sua sessão. Verifique o armazenamento do navegador e tente novamente.";
+  }
 })();
