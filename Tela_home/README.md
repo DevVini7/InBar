@@ -7,8 +7,9 @@ Projeto front-end em HTML, CSS e JavaScript. O mapa usa Leaflet e tiles cartogr�
 - `index.html`: HOME integrada; em primeiro acesso, encaminha à tela de onboarding até que as preferências sejam concluídas.
 - `onboarding.html`: seleção e personalização de interesses.
 - `js/places.js`: dados demonstrativos dos locais.
+- `js/place-media.js`: capas locais ilustrativas para registros sem foto e para evitar reutilizar a mesma imagem em locais diferentes.
 - `js/map.js`: criação do mapa, marcadores, navegação e geolocalização.
-- `js/place-card.js`: conteúdo e expansão do cartão de detalhes na HOME.
+- `js/place-card.js`: cartão de detalhes e publicações recentes obtidas do Feed compartilhado.
 - `js/app.js`: filtros, busca e eventos da interface.
 - `js/interests.js`: catálogo de interesses, persistência de preferências e pontuação de compatibilidade para recomendações.
 - `js/auth.js`: sessão de teste por aba e perfis locais usados para identificar cada usuário.
@@ -23,13 +24,19 @@ Projeto front-end em HTML, CSS e JavaScript. O mapa usa Leaflet e tiles cartogr�
 - `css/profile-menu.css`: menu de perfil da HOME.
 - `js/profile-appearance.js` e `css/profile-menu.css`: editor de aparência do perfil, com cores, molduras e foto de avatar salvas na conta local.
 - `js/profile.js` e `css/profile.css`: perfil com abas, edição de apelido/biografia/avatar, interesses, publicações próprias e dados privados da conta.
+- `js/missions.js` e `css/loyalty.css`: missões acompanhadas por ações no protótipo, saldo individual, histórico, loja demonstrativa e carteira de cupons.
 - `js/vibe.js` e `css/vibe.css`: escolha da vibe da sessão e priorização de lugares usando a vibe e os interesses permanentes.
 - `css/responsive.css`: ajustes para tablets e celulares.
-- `css/missions.css`: estilos isolados da tela de Missões.
-- `js/missions.js`: filtros, busca, detalhes e progresso demonstrativo das missões.
-- `css/feed.css` e `js/feed.js`: estilos e interações do Feed integrado, com filtros, publicações, curtidas, comentários e descoberta de locais.
+- `css/missions.css` e `css/loyalty.css`: estilos isolados da tela de Missões e da loja.
+- `css/feed.css` e `js/feed.js`: Feed geral e Feed por local em uma única estrutura; publicações relacionadas usam o ID do local e o mesmo armazenamento.
 - `../feed/Inbar/data.js`: conteúdo de exemplo recebido para o Feed; são exibidas somente publicações que correspondem a locais existentes em `js/places.js`.
 - `missions.html`: atalho que abre a tela integrada em `index.html#missions`; `missoes/index.html` mantém o caminho antigo como redirecionamento.
+
+## Locais, imagens e dados demonstrativos
+- Os 26 registros anteriores de `js/places.js` foram mantidos sem alteração. Foram acrescentados três locais públicos de Brasília (Centro Cultural Banco do Brasil Brasília, Cine Brasília e Parque da Cidade Dona Sarah Kubitschek), com coordenadas consultadas no OpenStreetMap e links para as respectivas referências de mapa.
+- Os mapas do InBar continuam usando Leaflet e tiles do OpenStreetMap; não foi adicionada API de mapas. O projeto deve atribuir dados cartográficos ao OpenStreetMap, conforme a licença ODbL.
+- Quando locais diferentes apontam para a mesma imagem, ou quando uma imagem não está cadastrada, a interface usa uma capa SVG ilustrativa única, com nome/categoria do local. Ela não é uma fotografia do estabelecimento. Os campos originais de imagem dos 26 registros não são substituídos.
+- O feed dos locais utiliza as mesmas publicações armazenadas no Feed geral, filtradas por `placeId`. Um local sem publicações mostra estado vazio; a interface não inventa eventos, horários, cardápios ou promoções.
 
 ## Fluxo inicial
 Abra `index.html` na raiz do projeto para iniciar no login. Após enviar credenciais válidas no modo de teste, o fluxo segue para `Tela_home/index.html`. Se as preferências ainda não tiverem sido concluídas, a HOME encaminha ao onboarding antes de exibir o mapa.
@@ -43,22 +50,25 @@ Abra `index.html` na raiz do projeto para iniciar no login. Após enviar credenc
 ## Recursos implementados
 - Mapa cartográfico real e interativo, centrado no Plano Piloto e enquadrado para mostrar as Asas Norte e Sul, com tratamento escuro em tons de cinza inspirado em mapas de navegação. Arraste para navegar e use a roda do mouse ou os botões +/− para aproximar.
 - Marcadores clicáveis com cores de status. Os detalhes do lugar só aparecem ao selecionar um marcador.
-- O cartão do local pode ser expandido na própria tela HOME para mostrar fotos, status, destaques e publicações demonstrativas; use "Como chegar" para abrir a rota no OpenStreetMap.
+- O cartão do local pode ser expandido na própria tela HOME para mostrar informações cadastradas e publicações existentes; use "Ver feed do local" para abrir a página compartilhada do local ou "Como chegar" para abrir a rota.
 - Filtros por bares, boates, música ao vivo, eventos, happy hour e hobbies; a busca sugere lugares e aceita nomes, regiões e termos relacionados, sem diferenciar acentos.
 - Marcadores com ícones SVG Lucide distintos para bares, boates, música ao vivo, eventos, boliche e karaokê; o mapa enquadra os pontos cadastrados e ancora cada pin na coordenada do local.
-- Menu visual de perfil com acesso à edição de preferências; as demais opções continuam demonstrativas.
+- Menu de perfil com acesso ao Perfil e à carteira de cupons.
 - Aparência personalizável por conta no menu de perfil: combinações de cores, cores individuais, molduras e foto quadrada comprimida; a prévia é isolada ao perfil, salva junto ao usuário neste navegador e pode ser restaurada ao padrão.
-- Perfil próprio com apelido público, nome completo, e-mail privado, biografia, interesses, publicações salvas e estado explícito das missões indisponíveis; edição de perfil e avatar pronto/foto ficam vinculados à conta local.
+- Perfil próprio com apelido público, nome completo, e-mail privado, biografia, interesses, publicações, progresso de missões e cupons demonstrativos; edição de perfil e avatar pronto/foto ficam vinculados à conta local.
 - Vibe da sessão perguntada após login, em cards com seleção múltipla ou opção de pular. A escolha usa `sessionStorage`, é apagada ao sair e não altera as preferências permanentes do onboarding.
 - Onboarding de interesses no primeiro acesso, com edição pelo menu de perfil e armazenamento versionado em `localStorage`. As preferências ficam separadas pelo identificador do perfil autenticado no protótipo; o modo anônimo permanece apenas como fallback para páginas sem sessão.
 - A autenticação de demonstração fica em `login.html`, com estilos em `css/login.css`, lógica de formulário em `js/login.js` e sessão/perfis em `js/auth.js`. Qualquer e-mail válido e senha não vazia são aceitos para teste. Os perfis registrados e as preferências são separados por usuário; a sessão é removida ao sair. Não há servidor nem verificação segura de credenciais, e senhas não são armazenadas.
 - Metadados de recomendação nos locais existentes no formato `interests: { categoryIds, tags }`. `InbarInterests.getCompatibilityScore()` retorna uma pontuação de 0 a 100; `rankEntities()` combina interesses permanentes com a vibe da sessão (70% vibe, 30% interesses quando ambos existem), priorizando lugares reais do catálogo em Explorar e nas sugestões da HOME/Feed, sem reordenar nem filtrar os marcadores do mapa. Categorias têm peso 1 e tags específicas peso 2.
-- Tela de Missões integrada à navegação: use "Missões" no cabeçalho; retorne pelo botão "Mapa", pela marca ou pelo histórico do navegador. A busca global filtra missões enquanto essa tela está aberta.
-- Feed integrado à navegação compartilhada: use "Feed", filtre por categoria ou autor, curta, comente, compartilhe ou crie publicações associadas a um local do catálogo. No protótipo, publicações e interações são armazenadas no `localStorage` deste navegador e associadas à sessão de teste; ainda não há sincronização por servidor. O conteúdo de exemplo fornecido na pasta `feed/` é identificado na tela e não representa atividade real.
+- Missões integradas à navegação: abrir detalhes de locais, consultar feeds distintos e publicar no Feed atualiza progresso persistido por conta. As recompensas de missão creditam pontos uma única vez; saldo e histórico não são compartilhados entre contas do navegador.
+- Loja de recompensas e Meus Cupons integrados: resgate exige saldo suficiente, confirmação, código demonstrativo persistido e movimentação negativa no histórico. Cupons podem ser marcados como utilizados; validade e estados ficam salvos localmente.
+- Feed integrado à navegação: use "Feed" para a linha do tempo geral ou "Ver feed do local" para abrir `#feed/local/<id>`. Ambos usam a mesma lista de publicações, com categorias, filtros, curtidas, comentários, compartilhamento e publicação associada a um `placeId`. O conteúdo de exemplo fornecido na pasta `feed/` é identificado na tela.
 - Apelidos são únicos no protótipo local e usados como nome público. Contas antigas com `username` continuam compatíveis. O Feed permite excluir somente posts do autor da sessão, com confirmação; exclusões e interações continuam restritas ao armazenamento local.
 - Explorar integrado à navegação: os cartões são gerados a partir dos locais do mapa e permitem abrir os detalhes do estabelecimento no mapa.
 - Geolocalização do navegador (requer permissão; em geral funciona em localhost ou HTTPS) posicionada sobre o mapa real.
 - Layout adaptável para desktop e celular.
+
+Missões, pontos, loja e cupons são simulações locais e não têm valor comercial; nenhuma recompensa está autorizada por parceiros. A contagem de "exploração" acompanha abertura de detalhes no site, não comprova visita física. Autenticação, saldo e permissões não são seguros sem backend e não sincronizam entre dispositivos.
 
 ## Como reutilizar os ícones
 - Use um símbolo existente de `assets/icons.svg` com `<svg class="icon" aria-hidden="true"><use href="assets/icons.svg#nome-do-icone"></use></svg>`.

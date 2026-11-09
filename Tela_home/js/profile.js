@@ -137,12 +137,17 @@
     document.getElementById("profileFullName").textContent = nickname;
     document.getElementById("profileButton").setAttribute("aria-label", `Abrir menu do perfil de ${nickname}`);
     document.getElementById("profileAppearancePreviewName").textContent = nickname;
-    document.getElementById("missionsUserName").textContent = nickname;
     const email = document.getElementById("profileEmail");
     email.textContent = user.email;
     email.hidden = !user.email;
     setAvatar(document.getElementById("profilePageAvatar"), appearance);
     if (window.InbarProfileAppearance) window.InbarProfileAppearance.applySavedAppearance(appearance);
+    if (window.InbarRewards) {
+      document.getElementById("profilePointsBalance").textContent =
+        new Intl.NumberFormat("pt-BR").format(window.InbarRewards.getBalance());
+      document.getElementById("profileCompletedMissions").textContent =
+        String(Object.keys(window.InbarRewards.getState().completedMissions).length);
+    }
     renderPosts(profilePosts());
     renderInterests();
     document.getElementById("profileHero").style.setProperty("--profile-accent", appearance.accent);
@@ -164,6 +169,7 @@
       panel.hidden = panel.dataset.profilePanel !== tab;
     });
     if (tab === "posts") renderPosts(profilePosts());
+    if (tab === "coupons" && window.InbarRewards) window.InbarRewards.renderCoupons();
   }
 
   function previewEditAvatar() {
@@ -277,6 +283,15 @@
     renderPosts(profilePosts());
   });
   window.addEventListener("inbar:profile-updated", render);
+  window.addEventListener("inbar:rewards-updated", () => {
+    if (window.InbarRewards) {
+      document.getElementById("profilePointsBalance").textContent =
+        new Intl.NumberFormat("pt-BR").format(window.InbarRewards.getBalance());
+      document.getElementById("profileCompletedMissions").textContent =
+        String(Object.keys(window.InbarRewards.getState().completedMissions).length);
+      if (activeTab === "coupons") window.InbarRewards.renderCoupons();
+    }
+  });
   window.addEventListener("inbar:preferences-updated", () => {
     if (!view.classList.contains("hidden")) renderInterests();
   });

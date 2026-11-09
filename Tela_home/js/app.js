@@ -117,6 +117,7 @@ function selectPlace(id, pan = false) {
   selectedId = id;
   window.InbarPlaceCard.render(place, showToast);
   window.InbarPlaceCard.show();
+  if (window.InbarRewards) window.InbarRewards.trackPlaceOpened(place.id);
   renderMarkers();
   if (pan) window.InbarMap.panTo(place);
 }
@@ -178,6 +179,13 @@ function clearSearch() {
 function setActivePage(page, updateHistory = true) {
   if (!Object.prototype.hasOwnProperty.call(searchValues, page)) return;
   if (page === activePage) {
+    if (page === "Feed" && window.InbarFeed) {
+      window.InbarFeed.showGeneralFeed();
+      if (updateHistory && window.location.hash !== "#feed") {
+        window.history.pushState({ page }, "", "#feed");
+      }
+      return;
+    }
     if (page === "Mapa") window.InbarMap.resetView();
     return;
   }
@@ -185,6 +193,7 @@ function setActivePage(page, updateHistory = true) {
   const searchInput = document.getElementById("searchInput");
   searchValues[activePage] = searchInput.value;
   activePage = page;
+  if (page === "Feed" && window.InbarFeed) window.InbarFeed.showGeneralFeed();
   searchInput.value = searchValues[page];
   searchInput.dispatchEvent(new Event("input", { bubbles: true }));
 
@@ -241,7 +250,7 @@ function renderExplore() {
     </header>
     <section class="explore-grid" aria-label="Lugares cadastrados">
       ${orderedMatches.map(place => `<article class="explore-card">
-        <img src="${escapeHtml(place.image)}" alt="" loading="lazy">
+        <img src="${escapeHtml(window.InbarPlaceMedia.getCoverImage(place))}" alt="${window.InbarPlaceMedia.isIllustrative(place) ? `Imagem ilustrativa de ${escapeHtml(place.name)}; foto não disponível` : `Ambiente de ${escapeHtml(place.name)}`}" data-place-image="${place.id}" loading="lazy">
         <div class="explore-card-body">
           <div class="explore-card-title"><h2>${escapeHtml(place.name)}</h2><span>${escapeHtml(place.category)}</span></div>
           <p>${escapeHtml(place.desc)}</p>
@@ -256,12 +265,17 @@ function renderExplore() {
 
 function routeFromHash() {
   const route = window.location.hash.replace(/^#\/?/, "").toLocaleLowerCase("pt-BR");
-  return route === "missions" || route === "feed" || route === "explorar" || route === "perfil" ? {
-    missions: "Missões",
-    feed: "Feed",
-    explorar: "Explorar",
-    perfil: "Perfil"
-  }[route] : "Mapa";
+  const localFeed = route.match(/^feed\/local\/(\d+)$/);
+  if (localFeed) return { page: "Feed", placeId: Number(localFeed[1]) };
+  return {
+    page: route === "missions" || route === "feed" || route === "explorar" || route === "perfil" ? {
+      missions: "Missões",
+      feed: "Feed",
+      explorar: "Explorar",
+      perfil: "Perfil"
+    }[route] : "Mapa",
+    placeId: null
+  };
 }
 
 function setupProfile() {
@@ -311,8 +325,7 @@ function togglePlaceDetails() {
 function showPlaceFeed() {
   const place = places.find(item => item.id === selectedId);
   if (!place) return;
-  setActivePage("Feed");
-  if (window.InbarFeed) window.InbarFeed.filterByPlace(place.id);
+  window.InbarNavigation.openPlaceFeed(place.id);
 }
 
 function setupEvents() {
@@ -328,7 +341,7 @@ function setupEvents() {
   document.getElementById("nextPlace").addEventListener("click", showNextPlace);
   document.getElementById("closeCard").addEventListener("click", hideSelectedPlace);
   document.getElementById("detailsButton").addEventListener("click", togglePlaceDetails);
-  document.getElementById("allPosts").addEventListener("click", () => setActivePage("Feed"));
+  document.getElementById("allPosts").addEventListener("click", showPlaceFeed);
   document.getElementById("feedButton").addEventListener("click", showPlaceFeed);
   document.getElementById("directionsButton").addEventListener("click", window.InbarPlaceCard.toggleNavigationOptions);
   document.querySelectorAll(".nav-link").forEach(button => {
@@ -340,6 +353,12 @@ function setupEvents() {
     const button = event.target.closest("[data-open-place]");
     if (button) window.InbarNavigation.openPlace(Number(button.dataset.openPlace));
   });
+  document.getElementById("exploreView").addEventListener("error", event => {
+    const image = event.target.closest("[data-place-image]");
+    if (!image) return;
+    const place = places.find(item => String(item.id) === image.dataset.placeImage);
+    if (place) window.InbarPlaceMedia.applyFallback(image, place);
+  }, true);
   document.getElementById("homeRecommendationsList").addEventListener("click", event => {
     const button = event.target.closest("[data-open-place]");
     if (button) window.InbarNavigation.openPlace(Number(button.dataset.openPlace));
@@ -350,13 +369,26 @@ function setupEvents() {
   window.addEventListener("inbar:preferences-updated", () => {
     if (activePage === "Explorar") renderExplore();
   });
+  window.addEventListener("inbar:feed-updated", () => {
+    const selectedPlace = places.find(place => place.id === selectedId);
+    if (selectedPlace) window.InbarPlaceCard.render(selectedPlace, showToast);
+  });
   document.querySelector(".brand").addEventListener("click", event => {
     if (activePage !== "Mapa") {
       event.preventDefault();
       setActivePage("Mapa");
     }
   });
-  const syncNavigation = () => setActivePage(routeFromHash(), false);
+  const syncNavigation = () => {
+    const route = routeFromHash();
+    setActivePage(route.page, false);
+    if (route.page === "Feed" && route.placeId !== null) {
+      if (!window.InbarFeed.filterByPlace(route.placeId)) {
+        setActivePage("Feed", false);
+        showToast("Este local não está mais disponível no catálogo.");
+      }
+    }
+  };
   window.addEventListener("popstate", syncNavigation);
   window.addEventListener("hashchange", syncNavigation);
   document.getElementById("profileButton").addEventListener("click", toggleProfileMenu);
@@ -376,6 +408,20 @@ function setupEvents() {
   document.getElementById("openProfile").addEventListener("click", () => {
     closeProfileMenu();
     setActivePage("Perfil");
+  });
+  document.getElementById("openCoupons").addEventListener("click", () => {
+    closeProfileMenu();
+    setActivePage("Perfil");
+    window.InbarProfile.selectTab("coupons");
+  });
+  document.getElementById("goToCoupons").addEventListener("click", event => {
+    event.preventDefault();
+    setActivePage("Perfil");
+    window.InbarProfile.selectTab("coupons");
+  });
+  document.getElementById("openRewardsFromCoupons").addEventListener("click", () => {
+    setActivePage("Missões");
+    window.InbarRewards.scrollToStore();
   });
   document.addEventListener("click", event => {
     if (!event.target.closest(".profile-menu-wrap")) closeProfileMenu();
@@ -397,12 +443,27 @@ function setupEvents() {
 
 window.InbarNavigation = {
   navigateTo: setActivePage,
+  openPlaceFeed(id) {
+    if (!places.some(place => place.id === id)) return;
+    setActivePage("Feed", false);
+    if (!window.InbarFeed.filterByPlace(id)) {
+      showToast("Não foi possível carregar o Feed deste local.");
+      return;
+    }
+    window.history.pushState({ page: "Feed", placeId: id }, "", `#feed/local/${encodeURIComponent(id)}`);
+  },
   openPlace(id) {
     if (!places.some(place => place.id === id)) return;
     setActivePage("Mapa");
-    window.requestAnimationFrame(() => {
-      if (activePage === "Mapa") selectPlace(id, true);
-    });
+    let selected = false;
+    const selectAfterReveal = () => {
+      if (selected || activePage !== "Mapa") return;
+      selected = true;
+      window.InbarMap.invalidateSize();
+      selectPlace(id, true);
+    };
+    window.requestAnimationFrame(selectAfterReveal);
+    window.setTimeout(selectAfterReveal, 100);
   }
 };
 
@@ -413,4 +474,10 @@ window.InbarMap.init({
 });
 setupEvents();
 renderMarkers();
-if (window.location.hash) setActivePage(routeFromHash(), false);
+if (window.location.hash) {
+  const route = routeFromHash();
+  setActivePage(route.page, false);
+  if (route.page === "Feed" && route.placeId !== null && !window.InbarFeed.filterByPlace(route.placeId)) {
+    showToast("Este local não está mais disponível no catálogo.");
+  }
+}

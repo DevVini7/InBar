@@ -10,6 +10,7 @@
   const emptyState = document.getElementById("feedEmpty");
   const categoryFilters = document.getElementById("feedCategoryFilters");
   const categorySelect = document.getElementById("postCategory");
+  const updateTypeSelect = document.getElementById("postUpdateType");
   const placeSelect = document.getElementById("postPlace");
   const publishDialog = document.getElementById("publishDialog");
   const commentsDialog = document.getElementById("commentsDialog");
@@ -19,6 +20,17 @@
   const imageInput = document.getElementById("postImage");
   const imagePreview = document.getElementById("postImagePreview");
   const toast = document.getElementById("feedToast");
+  const UPDATE_TYPES = [
+    "Experiências",
+    "Novidades",
+    "Eventos",
+    "Música ao vivo",
+    "Promoções",
+    "Happy hour",
+    "Cardápio",
+    "Bebidas",
+    "Avisos importantes"
+  ];
   const state = {
     posts: [],
     category: "Todas",
@@ -38,6 +50,11 @@
       '"': "&quot;",
       "'": "&#39;"
     })[character]);
+  }
+
+  function populateUpdateTypeSelect() {
+    updateTypeSelect.innerHTML = UPDATE_TYPES
+      .map(type => `<option value="${escapeHtml(type)}">${escapeHtml(type)}</option>`).join("");
   }
 
   function normalizeText(value) {
@@ -76,6 +93,7 @@
         image: /^https:\/\//i.test(post.image || "") ? post.image : "",
         placeId: matchingPlace.id,
         category: matchingPlace.types[0] || matchingPlace.category,
+        updateType: "Experiências",
         createdAt: "",
         baseLikes: Number.isInteger(post.likes) ? post.likes : 0,
         likes: [],
@@ -108,6 +126,7 @@
       && (post.type === "user" || post.type === "establishment")
       && typeof post.content === "string"
       && typeof post.category === "string"
+      && (post.updateType === undefined || UPDATE_TYPES.includes(post.updateType))
       && (post.placeId === null || Number.isInteger(post.placeId))
       && typeof post.image === "string"
       && (post.image === "" || /^https:\/\//i.test(post.image) || /^data:image\/jpeg;base64,/i.test(post.image))
@@ -166,11 +185,15 @@
   }
 
   function categories() {
-    return [...new Set(places.flatMap(place => place.types || []))].sort((a, b) => a.localeCompare(b, "pt-BR"));
+    const categoryLabels = [...UPDATE_TYPES, ...places.flatMap(place => place.types || [])];
+    return [...new Map(categoryLabels.map(category => [normalizeText(category), category])).values()]
+      .sort((a, b) => a.localeCompare(b, "pt-BR"));
   }
 
   function populateCategoryFilters() {
-    const availableCategories = categories();
+    const availableCategories = categories().filter(category =>
+      normalizeText(category) !== normalizeText("Experiências")
+    );
     categoryFilters.innerHTML = [
       `<button type="button" class="feed-filter is-selected" data-feed-category="Todas" aria-pressed="true">Todos</button>`,
       ...["Experiências", ...availableCategories].map(category => `<button type="button" class="feed-filter" data-feed-category="${escapeHtml(category)}" aria-pressed="false">${escapeHtml(category)}</button>`)
@@ -193,15 +216,19 @@
     const query = normalizeText(document.getElementById("searchInput").value.trim());
     return state.posts.filter(post => {
       const place = post.placeId === null ? null : placeById(post.placeId);
-      const categoryMatches = state.category === "Todas" || post.category === state.category;
+      const selectedCategory = normalizeText(state.category);
+      const categoryMatches = state.category === "Todas" || normalizeText(post.category) === selectedCategory;
+      const updateTypeMatches = state.category === "Todas"
+        || normalizeText(post.updateType || "Experiências") === selectedCategory
+        || (place?.types || []).some(type => normalizeText(type) === selectedCategory);
       const kindMatches = state.kind === "Todos"
         || (state.kind === "Pessoas" && post.type === "user")
         || (state.kind === "Estabelecimentos" && post.type === "establishment");
       const placeMatches = state.placeId === null || post.placeId === state.placeId;
       const currentUser = post.authorId === user.id ? window.InbarAuth.getCurrentUser() : null;
       const authorName = currentUser?.displayName || currentUser?.nickname || post.authorName;
-      const searchable = normalizeText(`${authorName} ${post.authorName} ${post.content} ${post.category} ${place?.name || ""} ${place?.distance || ""}`);
-      return categoryMatches && kindMatches && placeMatches && (!query || searchable.includes(query));
+      const searchable = normalizeText(`${authorName} ${post.authorName} ${post.content} ${post.category} ${post.updateType || ""} ${place?.name || ""} ${place?.distance || ""}`);
+      return (categoryMatches || updateTypeMatches) && kindMatches && placeMatches && (!query || searchable.includes(query));
     });
   }
 
@@ -254,7 +281,8 @@
           <span>${escapeHtml(formatPostDate(post))}</span>
         </div>
         <div class="feed-post-badges">
-          <span class="feed-category">${escapeHtml(post.category)}</span>
+          <span class="feed-category">${escapeHtml(post.updateType || "Experiências")}</span>
+          ${place && place.category !== post.category ? `<span class="feed-category">${escapeHtml(place.category)}</span>` : ""}
           ${post.isExample ? '<span class="feed-example-badge">Exemplo</span>' : ""}
         </div>
         ${menuMarkup}
@@ -297,14 +325,41 @@
       <article class="feed-place-item">
         <span class="feed-place-icon" aria-hidden="true"><svg class="icon"><use href="assets/icons.svg#${escapeHtml(place.icon || "map-pin")}"></use></svg></span>
         <div><strong>${escapeHtml(place.name)}</strong><span>${escapeHtml(place.category)} · ${escapeHtml(place.distance)}</span></div>
-        <button type="button" data-feed-action="open-place" data-place-id="${place.id}" aria-label="Ver ${escapeHtml(place.name)} no mapa">→</button>
+        <button type="button" data-feed-action="open-place-feed" data-place-id="${place.id}" aria-label="Abrir o Feed de ${escapeHtml(place.name)}">Feed</button>
       </article>`).join("");
   }
 
+  function renderLocalFeedHeader() {
+    const header = document.getElementById("localFeedHeader");
+    const place = state.placeId === null ? null : placeById(state.placeId);
+    const localHeading = document.getElementById("localFeedName");
+    document.getElementById("generalFeedHeading").classList.toggle("hidden", Boolean(place));
+    header.classList.toggle("hidden", !place);
+    if (!place) return;
+
+    localHeading.textContent = place.name;
+    document.getElementById("localFeedCategory").textContent = place.types.join(" · ");
+    document.getElementById("localFeedAddress").textContent = place.distance;
+    document.getElementById("localFeedDescription").textContent = place.desc || "Informações adicionais ainda não cadastradas.";
+    const source = document.getElementById("localFeedSource");
+    source.hidden = !place.sourceUrl;
+    if (place.sourceUrl) source.href = place.sourceUrl;
+    const cover = document.getElementById("localFeedCover");
+    cover.src = window.InbarPlaceMedia.getCoverImage(place);
+    cover.alt = window.InbarPlaceMedia.isIllustrative(place)
+      ? `Imagem ilustrativa de ${place.name}; foto não disponível`
+      : `Capa de ${place.name}`;
+    cover.addEventListener("error", () => window.InbarPlaceMedia.applyFallback(cover, place), { once: true });
+  }
+
   function renderPosts() {
+    renderLocalFeedHeader();
     const filteredPosts = selectedFilterPosts();
     postsContainer.innerHTML = filteredPosts.map(postCard).join("");
     emptyState.hidden = filteredPosts.length > 0;
+    emptyState.textContent = state.placeId === null
+      ? "Nenhuma publicação encontrada. Tente outro filtro ou busca."
+      : "Este local ainda não tem publicações no Feed. Não há atualizações demonstrativas ou informações de eventos/ofertas sem confirmação.";
   }
 
   function renderComments(post) {
@@ -334,6 +389,8 @@
   }
 
   function openPublishDialog() {
+    placeSelect.value = state.placeId === null ? "" : String(state.placeId);
+    updatePostPlaceCategory(true);
     publishDialog.showModal();
     document.getElementById("postContent").focus();
   }
@@ -452,6 +509,11 @@
     if (action.dataset.feedAction === "close-comments") closeDialog(commentsDialog);
     if (action.dataset.feedAction === "explore") window.InbarNavigation.navigateTo("Explorar");
     if (action.dataset.feedAction === "open-place") window.InbarNavigation.openPlace(placeId);
+    if (action.dataset.feedAction === "open-place-feed") window.InbarNavigation.openPlaceFeed(placeId);
+    if (action.dataset.feedAction === "back-to-general") window.InbarNavigation.navigateTo("Feed");
+    if (action.dataset.feedAction === "view-place-details" && state.placeId !== null) {
+      window.InbarNavigation.openPlace(state.placeId);
+    }
     if (action.dataset.feedAction === "comments") openComments(postId);
     if (action.dataset.feedAction === "share") sharePost(postId);
     if (action.dataset.feedAction === "delete") {
@@ -537,25 +599,30 @@
         image: state.pendingImage,
         placeId,
         category: categorySelect.value,
+        updateType: updateTypeSelect.value,
         createdAt: new Date().toISOString(),
         baseLikes: 0,
         likes: [],
         comments: [],
         isExample: false
       };
+      const currentFeedPlaceId = state.placeId;
       if (!commitPosts([newPost, ...state.posts], "Publicação salva neste navegador (modo protótipo).")) return;
       state.category = "Todas";
       state.kind = "Todos";
-      state.placeId = null;
+      state.placeId = currentFeedPlaceId;
       document.getElementById("searchInput").value = "";
       publishForm.reset();
+      placeSelect.value = currentFeedPlaceId === null ? "" : String(currentFeedPlaceId);
       state.pendingImage = "";
       imagePreview.removeAttribute("src");
       imagePreview.hidden = true;
       updatePostPlaceCategory();
       categoryFilters.querySelector('[data-feed-category="Todas"]').click();
       view.querySelector('[data-feed-kind="Todos"]').click();
+      renderPosts();
       closeDialog(publishDialog);
+      window.dispatchEvent(new CustomEvent("inbar:feed-post-created", { detail: { postId: newPost.id } }));
     });
     commentForm.addEventListener("submit", event => {
       event.preventDefault();
@@ -616,17 +683,34 @@
 
   populateCategoryFilters();
   populatePlaceSelect();
+  populateUpdateTypeSelect();
   updatePostPlaceCategory();
   renderPlaces();
   renderPosts();
   setupEvents();
   window.InbarFeed = {
     filterByPlace(placeId) {
-      state.placeId = placeById(placeId) ? placeId : null;
+      const place = placeById(placeId);
+      if (!place) return false;
+      state.placeId = place.id;
       state.category = "Todas";
       state.kind = "Todos";
       categoryFilters.querySelector('[data-feed-category="Todas"]').click();
       view.querySelector('[data-feed-kind="Todos"]').click();
+      renderLocalFeedHeader();
+      if (window.InbarRewards) window.InbarRewards.trackLocalFeedViewed(place.id);
+      return true;
+    },
+    showGeneralFeed() {
+      state.placeId = null;
+      state.category = "Todas";
+      state.kind = "Todos";
+      renderLocalFeedHeader();
+      categoryFilters.querySelector('[data-feed-category="Todas"]').click();
+      view.querySelector('[data-feed-kind="Todos"]').click();
+    },
+    getPostsByPlace(placeId) {
+      return state.posts.filter(post => post.placeId === placeId);
     },
     getPostsByAuthor(authorId) {
       return state.posts.filter(post => post.authorId === authorId && !post.isExample);

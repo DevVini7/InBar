@@ -54,6 +54,18 @@
   font-weight: 700;
 }
 
+.place-description {
+  margin: 0 0 8px;
+  color: #aeb8cc;
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+.place-description[hidden],
+.promotion[hidden] {
+  display: none;
+}
+
 .distance {
   color: #9ca8c1;
   font-size: 14px;
@@ -419,6 +431,13 @@
   line-height: 1.35;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
+}
+
+.place-posts-empty {
+  grid-column: 1 / -1;
+  margin: 0;
+  color: #9ca8c1;
+  font-size: 11px;
 }
 
 .detail-actions {

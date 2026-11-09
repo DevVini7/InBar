@@ -456,6 +456,54 @@ window.inbarPlaces = [{
   searchTerms: ["karaokê", "microfone", "cantar", "paranoa"],
   rating: "4,8",
   reviews: 67
+}, {
+  id: 27,
+  name: "Centro Cultural Banco do Brasil Brasília",
+  category: "Cultura",
+  icon: "images",
+  types: ["Cultura", "Exposições", "Eventos"],
+  lat: -15.8136550,
+  lng: -47.8382863,
+  distance: "SCES Trecho 2 • Plano Piloto",
+  status: "Dados ao vivo indisponíveis",
+  level: "purple",
+  image: "",
+  desc: "Centro cultural. Consulte os canais oficiais para programação e informações atualizadas.",
+  searchTerms: ["ccbb", "centro cultural", "exposições", "cultura"],
+  sourceUrl: "https://www.openstreetmap.org/way/126584698",
+  imageIsIllustrative: true
+}, {
+  id: 28,
+  name: "Cine Brasília",
+  category: "Cinema",
+  icon: "images",
+  types: ["Cinema", "Cultura", "Eventos"],
+  lat: -15.8139505,
+  lng: -47.8995989,
+  distance: "SQS 106 • Asa Sul",
+  status: "Dados ao vivo indisponíveis",
+  level: "purple",
+  image: "",
+  desc: "Cinema no Plano Piloto. Consulte os canais oficiais para sessões e informações atualizadas.",
+  searchTerms: ["cinema", "cine brasilia", "cultura", "asa sul"],
+  sourceUrl: "https://www.openstreetmap.org/way/140909782",
+  imageIsIllustrative: true
+}, {
+  id: 29,
+  name: "Parque da Cidade Dona Sarah Kubitschek",
+  category: "Parques",
+  icon: "map-pin",
+  types: ["Parques", "Ar livre", "Esportes"],
+  lat: -15.8012558,
+  lng: -47.9102131,
+  distance: "SRPS • Asa Sul",
+  status: "Dados ao vivo indisponíveis",
+  level: "purple",
+  image: "",
+  desc: "Parque urbano público. Consulte os canais oficiais para regras e informações atualizadas.",
+  searchTerms: ["parque da cidade", "ar livre", "esportes", "asa sul"],
+  sourceUrl: "https://www.openstreetmap.org/way/25535698",
+  imageIsIllustrative: true
 }];
 
 window.InbarInterests.attachPlaceMetadata(window.inbarPlaces);

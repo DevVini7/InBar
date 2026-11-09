@@ -1,0 +1,752 @@
+#missionsView [hidden],
+#feedView [hidden],
+#profileView [hidden],
+#placeCard [hidden] {
+  display: none !important;
+}
+
+#missionsView {
+  overflow: auto;
+  padding: 28px clamp(16px, 3vw, 42px) 48px;
+  background:
+    radial-gradient(ellipse at 82% 0, rgba(152, 37, 203, .15), transparent 34%),
+    #050711;
+}
+
+.loyalty-layout {
+  width: min(100%, 1320px);
+  margin: 0 auto;
+}
+
+.loyalty-hero,
+.loyalty-section-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.loyalty-hero {
+  align-items: center;
+  padding: 10px 0 24px;
+}
+
+.loyalty-kicker {
+  margin: 0 0 8px;
+  color: #d275f5;
+  font-size: 10px;
+  font-weight: 750;
+  letter-spacing: .14em;
+}
+
+.loyalty-hero h1,
+.loyalty-section-heading h2 {
+  margin: 0;
+  color: #f7f5ff;
+  font-size: clamp(26px, 3vw, 36px);
+  letter-spacing: -.04em;
+}
+
+.loyalty-hero p:last-child,
+.loyalty-section-heading p:last-child {
+  margin: 8px 0 0;
+  color: #aab3c9;
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.loyalty-hero > a {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border: 1px solid rgba(198, 104, 239, .3);
+  border-radius: 10px;
+  color: #e6b6ff;
+  font-size: 13px;
+  font-weight: 650;
+  text-decoration: none;
+}
+
+.points-dashboard {
+  display: grid;
+  grid-template-columns: minmax(210px, 1.2fr) repeat(2, minmax(120px, .7fr)) minmax(230px, 1.2fr);
+  gap: 12px;
+}
+
+.points-balance-card,
+.points-stat,
+.points-next-reward {
+  min-width: 0;
+  min-height: 116px;
+  padding: 19px 21px;
+  border: 1px solid rgba(145, 158, 191, .15);
+  border-radius: 16px;
+  background: linear-gradient(145deg, rgba(19, 19, 40, .96), rgba(11, 12, 26, .95));
+}
+
+.points-balance-card {
+  border-color: rgba(209, 94, 247, .34);
+  background:
+    radial-gradient(circle at 85% 12%, rgba(196, 67, 241, .2), transparent 45%),
+    linear-gradient(145deg, #1d1030, #100e20);
+}
+
+.points-balance-card > p,
+.points-stat > span,
+.points-next-reward > div > span {
+  display: block;
+  margin: 0 0 11px;
+  color: #aab3c9;
+  font-size: 11px;
+}
+
+.points-balance-card > strong {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  color: #fff;
+  font-size: clamp(26px, 3vw, 35px);
+  letter-spacing: -.04em;
+}
+
+.points-balance-card > strong small {
+  color: #d2a6e8;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+
+.prototype-tag {
+  display: inline-block;
+  margin-top: 8px;
+  color: #cf9ce4;
+  font-size: 10px;
+}
+
+.points-stat {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.points-stat strong {
+  color: #f4edff;
+  font-size: 26px;
+  letter-spacing: -.03em;
+}
+
+.points-stat small {
+  margin-top: 3px;
+  color: #8792aa;
+  font-size: 10px;
+}
+
+.points-next-reward {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.points-next-reward > div > strong,
+.points-next-reward > div > small {
+  display: block;
+}
+
+.points-next-reward > div > strong {
+  overflow: hidden;
+  color: #f4edff;
+  font-size: 13px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.points-next-reward > div > small {
+  margin-top: 4px;
+  color: #aab3c9;
+  font-size: 10px;
+}
+
+.points-next-reward progress,
+.mission-progress progress,
+.near-reward progress {
+  width: 100%;
+  height: 7px;
+  margin-top: 11px;
+  overflow: hidden;
+  border: 0;
+  border-radius: 99px;
+  background: #222238;
+  color: #d24af1;
+  accent-color: #d24af1;
+}
+
+.points-next-reward progress::-webkit-progress-bar,
+.mission-progress progress::-webkit-progress-bar,
+.near-reward progress::-webkit-progress-bar {
+  border-radius: 99px;
+  background: #222238;
+}
+
+.points-next-reward progress::-webkit-progress-value,
+.mission-progress progress::-webkit-progress-value,
+.near-reward progress::-webkit-progress-value {
+  border-radius: 99px;
+  background: linear-gradient(90deg, #a326e7, #ef4fc9);
+}
+
+.loyalty-prototype-note {
+  margin: 13px 0 0;
+  color: #969eb3;
+  font-size: 11px;
+  line-height: 1.55;
+}
+
+.loyalty-section {
+  margin-top: 34px;
+}
+
+.loyalty-section-heading {
+  margin-bottom: 16px;
+}
+
+.loyalty-section-heading h2 {
+  font-size: 23px;
+}
+
+.loyalty-section-heading > span {
+  flex: 0 0 auto;
+  color: #aab3c9;
+  font-size: 12px;
+}
+
+.loyalty-filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.loyalty-filter-row button,
+.reward-filter-row button {
+  min-height: 34px;
+  padding: 0 13px;
+  border: 1px solid rgba(145, 158, 191, .17);
+  border-radius: 999px;
+  background: #0c0d1b;
+  color: #aab3c9;
+  font-size: 12px;
+}
+
+.loyalty-filter-row button[aria-pressed="true"],
+.reward-filter-row button[aria-pressed="true"] {
+  border-color: rgba(210, 74, 241, .56);
+  background: rgba(166, 38, 206, .16);
+  color: #f0c4ff;
+}
+
+.loyalty-mission-grid,
+.reward-catalog {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.loyalty-mission-card,
+.reward-card,
+.coupon-card {
+  min-width: 0;
+  padding: 19px;
+  border: 1px solid rgba(145, 158, 191, .14);
+  border-radius: 16px;
+  background: linear-gradient(145deg, rgba(15, 17, 34, .98), rgba(9, 10, 22, .97));
+}
+
+.mission-card-topline,
+.mission-progress-label,
+.reward-card-heading,
+.coupon-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.mission-category,
+.reward-category {
+  margin: 0;
+  color: #c58cde;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+
+.mission-status,
+.coupon-status {
+  flex: 0 0 auto;
+  padding: 5px 8px;
+  border: 1px solid rgba(145, 158, 191, .16);
+  border-radius: 999px;
+  color: #abb3c8;
+  font-size: 10px;
+}
+
+.mission-status.is-in-progress {
+  border-color: rgba(61, 190, 166, .3);
+  color: #85dec6;
+}
+
+.mission-status.is-completed {
+  border-color: rgba(201, 111, 240, .34);
+  color: #dfabf6;
+}
+
+.loyalty-mission-card h3,
+.reward-card h3,
+.coupon-card h4 {
+  margin: 15px 0 7px;
+  color: #f4f2fb;
+  font-size: 17px;
+}
+
+.loyalty-mission-card > p,
+.reward-card > p,
+.coupon-card > p {
+  margin: 0;
+  color: #a3acc1;
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.mission-progress {
+  margin-top: 18px;
+}
+
+.mission-progress-label {
+  color: #dce0ee;
+  font-size: 12px;
+}
+
+.mission-progress-label span:last-child {
+  color: #9fa8bd;
+}
+
+.mission-progress > small {
+  display: block;
+  margin-top: 5px;
+  color: #8993aa;
+  font-size: 10px;
+}
+
+.mission-reward {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 15px;
+  padding-top: 13px;
+  border-top: 1px solid rgba(145, 158, 191, .12);
+  color: #aeb8cc;
+  font-size: 11px;
+}
+
+.mission-reward strong {
+  color: #efc6ff;
+  font-size: 13px;
+}
+
+.reward-filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 0 14px;
+}
+
+.reward-illustration {
+  display: grid;
+  min-height: 108px;
+  place-items: center;
+  border: 1px solid rgba(209, 113, 241, .13);
+  border-radius: 11px;
+  background:
+    radial-gradient(circle at 50% 20%, rgba(201, 72, 235, .28), transparent 46%),
+    linear-gradient(130deg, #1b1530, #101222);
+  color: #e6a8ff;
+  font-size: 26px;
+}
+
+.reward-illustration small {
+  display: block;
+  margin-top: 3px;
+  color: #c8b3d3;
+  font-size: 9px;
+  letter-spacing: .1em;
+}
+
+.reward-card-heading {
+  margin-top: 13px;
+}
+
+.reward-card-heading .reward-category {
+  margin: 0;
+}
+
+.reward-cost {
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+  margin-top: 14px;
+  color: #f2caff;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.reward-cost small {
+  color: #a2abc0;
+  font-size: 10px;
+  font-weight: 500;
+}
+
+.reward-demo-note {
+  margin-top: 10px !important;
+  color: #d5aee4 !important;
+  font-size: 10px !important;
+}
+
+.reward-card button,
+.coupon-card button {
+  width: 100%;
+  min-height: 40px;
+  margin-top: 13px;
+  border: 1px solid rgba(210, 74, 241, .5);
+  border-radius: 10px;
+  background: linear-gradient(110deg, #8e22c2, #ba2fb8);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.reward-card button:disabled {
+  border-color: rgba(145, 158, 191, .14);
+  background: #171827;
+  color: #7f899e;
+}
+
+.loyalty-empty,
+.coupon-empty {
+  padding: 18px;
+  border: 1px dashed rgba(145, 158, 191, .18);
+  border-radius: 12px;
+  color: #a6afc3;
+  font-size: 12px;
+}
+
+.loyalty-history {
+  margin-top: 28px;
+  padding: 16px 18px;
+  border: 1px solid rgba(145, 158, 191, .14);
+  border-radius: 14px;
+  background: rgba(11, 12, 25, .92);
+}
+
+.loyalty-history summary {
+  color: #e2d9ed;
+  font-size: 13px;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.points-history-list {
+  display: grid;
+  gap: 9px;
+  padding-top: 13px;
+}
+
+.points-history-entry {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  color: #aab3c9;
+  font-size: 11px;
+}
+
+.points-history-entry strong {
+  color: #d8b2ea;
+}
+
+.points-history-entry strong.is-debit {
+  color: #f097a8;
+}
+
+.redeem-dialog {
+  width: min(92vw, 420px);
+  padding: 25px;
+  border: 1px solid rgba(204, 106, 239, .3);
+  border-radius: 18px;
+  background: #101020;
+  color: #f7f4fc;
+}
+
+.redeem-dialog::backdrop {
+  background: rgba(2, 3, 10, .78);
+  backdrop-filter: blur(4px);
+}
+
+.redeem-dialog h2 {
+  margin: 0 0 9px;
+  font-size: 22px;
+}
+
+.redeem-dialog p:not(.loyalty-kicker) {
+  color: #abb4c9;
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.redeem-dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 9px;
+  margin-top: 18px;
+}
+
+.redeem-dialog-actions button {
+  min-height: 40px;
+  padding: 0 13px;
+  border: 1px solid rgba(145, 158, 191, .2);
+  border-radius: 9px;
+  background: #18192b;
+  color: #eef0f8;
+}
+
+.redeem-dialog-actions #confirmRedeem {
+  border: 0;
+  background: linear-gradient(110deg, #8e22c2, #ba2fb8);
+}
+
+.missions-toast {
+  position: fixed;
+  z-index: 80;
+  right: 24px;
+  bottom: 24px;
+  max-width: min(420px, calc(100vw - 32px));
+  padding: 12px 16px;
+  border: 1px solid rgba(215, 121, 245, .3);
+  border-radius: 11px;
+  background: #1a1428;
+  color: #f3e7fb;
+  font-size: 12px;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(8px);
+  transition: opacity .16s ease, transform .16s ease;
+}
+
+.missions-toast.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.profile-loyalty-summary {
+  width: fit-content;
+  padding: 15px 18px;
+  border: 1px solid rgba(199, 98, 239, .24);
+  border-radius: 12px;
+  background: rgba(106, 35, 136, .12);
+}
+
+.profile-loyalty-summary strong {
+  color: #f0c6ff;
+  font-size: 19px;
+}
+
+.profile-loyalty-summary p {
+  margin: 5px 0 0;
+  color: #9da7bb;
+  font-size: 11px;
+}
+
+.coupon-sections {
+  display: grid;
+  gap: 25px;
+}
+
+.coupon-sections > section > h3 {
+  margin: 0 0 11px;
+  color: #f1eafa;
+  font-size: 15px;
+}
+
+.coupon-card-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.coupon-card h4 {
+  margin-top: 0;
+}
+
+.coupon-card-header .coupon-status {
+  text-transform: capitalize;
+}
+
+.coupon-card details {
+  margin-top: 11px;
+  color: #c4c9d7;
+  font-size: 11px;
+}
+
+.coupon-card details summary {
+  cursor: pointer;
+}
+
+.coupon-code {
+  display: block;
+  margin-top: 10px;
+  padding: 9px;
+  border: 1px dashed rgba(213, 139, 241, .36);
+  border-radius: 8px;
+  color: #e7c4f4;
+  font-family: ui-monospace, Consolas, monospace;
+  letter-spacing: .06em;
+}
+
+.coupon-expiry {
+  margin-top: 8px !important;
+  font-size: 10px !important;
+}
+
+.near-reward progress {
+  margin: 12px 0 5px;
+}
+
+.local-feed-header {
+  display: grid;
+  grid-template-columns: minmax(150px, 250px) minmax(0, 1fr);
+  gap: 18px;
+  margin: 0 0 18px;
+  padding: 14px;
+  border: 1px solid rgba(145, 158, 191, .15);
+  border-radius: 16px;
+  background: linear-gradient(135deg, rgba(21, 17, 38, .98), rgba(9, 11, 24, .98));
+}
+
+.local-feed-back {
+  display: inline-flex;
+  grid-column: 1 / -1;
+  align-items: center;
+  justify-self: start;
+  gap: 7px;
+  padding: 5px 0;
+  border: 0;
+  background: transparent;
+  color: #d6a5eb;
+  font-size: 12px;
+}
+
+.local-feed-back .icon {
+  width: 15px;
+  height: 15px;
+}
+
+.local-feed-header > img {
+  width: 100%;
+  height: 150px;
+  border-radius: 11px;
+  object-fit: cover;
+}
+
+.local-feed-info h1 {
+  margin: 0;
+  color: #f7f4fc;
+  font-size: 22px;
+}
+
+.local-feed-info > p:not(.feed-kicker) {
+  margin: 6px 0 0;
+  color: #aab3c9;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.local-feed-info > a {
+  display: inline-block;
+  margin-top: 8px;
+  color: #d9a6f1;
+  font-size: 11px;
+}
+
+.local-feed-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 9px;
+}
+
+.local-feed-actions .feed-primary-button {
+  min-height: 34px;
+  padding: 0 11px;
+  font-size: 11px;
+}
+
+.local-feed-info .feed-text-button {
+  margin: 0;
+  padding: 0;
+}
+
+@media (max-width: 900px) {
+  .points-dashboard {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  #missionsView {
+    padding: 20px 14px 38px;
+  }
+
+  .loyalty-hero,
+  .loyalty-section-heading {
+    align-items: flex-start;
+  }
+
+  .loyalty-hero {
+    flex-direction: column;
+  }
+
+  .loyalty-mission-grid,
+  .reward-catalog,
+  .coupon-card-list {
+    grid-template-columns: 1fr;
+  }
+
+  .points-dashboard {
+    gap: 8px;
+  }
+
+  .points-balance-card,
+  .points-stat,
+  .points-next-reward {
+    min-height: 100px;
+    padding: 14px;
+  }
+
+  .points-next-reward {
+    grid-column: 1 / -1;
+  }
+
+  .local-feed-header {
+    grid-template-columns: 1fr;
+  }
+
+  .local-feed-back {
+    grid-column: auto;
+  }
+
+  .local-feed-header > img {
+    height: 170px;
+  }
+}

@@ -18,28 +18,34 @@ window.InbarPlaceCard = (() => {
 
   function render(place, onMessage) {
     document.getElementById("placeName").textContent = place.name;
-    document.getElementById("placeScore").textContent = place.rating;
-    document.getElementById("placeReviews").textContent = `(${place.reviews} avaliações)`;
+    document.getElementById("placeDescription").textContent = place.desc || "";
+    document.getElementById("placeDescription").hidden = !place.desc;
+    document.getElementById("placeScore").textContent = place.rating || "";
+    document.getElementById("placeReviews").textContent = Number.isFinite(place.reviews) ? `(${place.reviews} avaliações)` : "";
+    document.getElementById("placeRating").classList.toggle("hidden", !place.rating || !Number.isFinite(place.reviews));
     document.getElementById("placeDistance").textContent = place.distance;
-    document.getElementById("placeStatus").textContent = place.status;
-    document.getElementById("placeOccupancy").textContent = `${place.occupancy}%`;
-    document.getElementById("placePosts").textContent = place.posts;
-    const primaryImage = place.images && place.images.length ? place.images[0] : place.image;
-    document.getElementById("placeImage").src = primaryImage;
-    document.getElementById("placeImage").alt = `Ambiente de ${place.name}`;
-    document.getElementById("statusDot").style.borderColor = placeColors[place.level];
-    document.getElementById("placeStatus").style.color = placeColors[place.level];
+    document.getElementById("placeStatus").textContent = place.status || "Informações não disponíveis";
+    document.getElementById("statusDot").style.borderColor = placeColors[place.level] || placeColors.purple;
+    document.getElementById("placeStatus").style.color = placeColors[place.level] || placeColors.purple;
+    const occupancyStat = document.getElementById("placeOccupancyStat");
+    const hasOccupancy = Number.isFinite(place.occupancy);
+    occupancyStat.classList.toggle("hidden", !hasOccupancy);
+    if (hasOccupancy) document.getElementById("placeOccupancy").textContent = `${place.occupancy}%`;
+    const localPosts = window.InbarFeed ? window.InbarFeed.getPostsByPlace(place.id) : [];
+    document.getElementById("placePosts").textContent = String(localPosts.length);
+    document.getElementById("placePostsStat").classList.toggle("hidden", localPosts.length === 0);
+    const primaryImage = window.InbarPlaceMedia.getCoverImage(place);
+    const placeImage = document.getElementById("placeImage");
+    placeImage.src = primaryImage;
+    placeImage.alt = window.InbarPlaceMedia.isIllustrative(place)
+      ? `Imagem ilustrativa de ${place.name}; foto não disponível`
+      : `Ambiente de ${place.name}`;
+    placeImage.addEventListener("error", () => window.InbarPlaceMedia.applyFallback(placeImage, place), { once: true });
 
-    const hasCustomPhotos = Boolean(place.images && place.images.length);
-    const photos = hasCustomPhotos ? place.images : [
-      place.image.replace("w=900&h=560", "w=900&h=600"),
-      "https://images.unsplash.com/photo-1501386761578-eac5c94b800a?w=900&h=600&fit=crop",
-      "https://images.unsplash.com/photo-1514933651103-005eec06c04b?w=900&h=600&fit=crop"
-    ];
-    renderPhotos(photos, onMessage, hasCustomPhotos);
+    renderPhotos(place, onMessage);
     renderFeatures(place);
-    renderPosts(place, photos);
-    document.getElementById("promotionText").textContent = "Condições demonstrativas";
+    renderPosts(place, localPosts);
+    document.querySelector(".promotion").hidden = true;
     configureDirections(place);
   }
 
@@ -72,7 +78,8 @@ window.InbarPlaceCard = (() => {
   const placeColors = {
     green: "#00e7b0",
     yellow: "#ffcf35",
-    red: "#ff4d52"
+    red: "#ff4d52",
+    purple: "#d1a2e8"
   };
 
   function getThumbnailSource(source, width, height) {
@@ -80,8 +87,14 @@ window.InbarPlaceCard = (() => {
       .replace("w=900&h=560", `w=${width}&h=${height}`);
   }
 
-  function renderPhotos(photos, onMessage, hasCustomPhotos) {
+  function renderPhotos(place, onMessage) {
     photosElement.replaceChildren();
+    const cover = window.InbarPlaceMedia.getCoverImage(place);
+    const photos = Array.isArray(place.gallery) && place.gallery.length
+      ? place.gallery
+      : Array.isArray(place.images) && place.images.length
+        ? place.images
+        : [cover];
     photos.forEach((source, index) => {
       const button = document.createElement("button");
       button.className = `gallery-thumb${index === 0 ? " active" : ""}`;
@@ -90,6 +103,7 @@ window.InbarPlaceCard = (() => {
       const image = document.createElement("img");
       image.src = getThumbnailSource(source, 120, 100);
       image.alt = "";
+      image.addEventListener("error", () => window.InbarPlaceMedia.applyFallback(image, place), { once: true });
       button.append(image);
       button.addEventListener("click", () => {
         document.getElementById("placeImage").src = source;
@@ -100,60 +114,35 @@ window.InbarPlaceCard = (() => {
       photosElement.append(button);
     });
 
-    if (!hasCustomPhotos) {
-      const morePhotos = document.createElement("button");
-      morePhotos.className = "gallery-thumb gallery-more";
-      morePhotos.type = "button";
-      morePhotos.textContent = "+8 fotos";
-      morePhotos.addEventListener("click", () => onMessage("Galeria de fotos demonstrativa."));
-      photosElement.append(morePhotos);
-    }
   }
 
   function renderFeatures(place) {
-    const icons = {
-      "Música ao vivo": "music-2",
-      "Happy Hour": "martini",
-      "Eventos": "calendar-days",
-      "Boates": "headphones",
-      "Hobbies": place.icon || "gamepad-2",
-      "Outros": "ellipsis"
-    };
     featureList.replaceChildren();
-    place.types.filter(type => type !== "Bares").slice(0, 2).forEach(type => {
+    place.types.slice(0, 3).forEach(type => {
       const feature = document.createElement("div");
       feature.className = "feature-chip";
       const icon = document.createElement("span");
       icon.className = "feature-icon";
-      icon.append(createIcon(icons[type] || "map"));
+      icon.append(createIcon(place.icon || "map-pin"));
       const text = document.createElement("span");
       text.append(document.createTextNode(type));
-      const time = document.createElement("small");
-      time.textContent = "Hoje à noite";
-      text.append(time);
+      const label = document.createElement("small");
+      label.textContent = "Categoria cadastrada";
+      text.append(label);
       feature.append(icon, text);
       featureList.append(feature);
     });
   }
 
-  function renderPosts(place, photos) {
-    const posts = [{
-      user: "joaosilva",
-      time: "há 12 min",
-      text: `${place.status.replace(" agora","")} por aqui! 🔥`,
-      image: photos[0]
-    }, {
-      user: "mariana.r",
-      time: "há 28 min",
-      text: "Happy hour imperdível! 🍹",
-      image: photos[2] || photos[0]
-    }, {
-      user: "villaficial",
-      time: "há 1 h",
-      text: `${place.desc} 🎶`,
-      image: photos[1] || photos[0]
-    }];
+  function renderPosts(place, posts) {
     postList.replaceChildren();
+    if (!posts.length) {
+      const empty = document.createElement("p");
+      empty.className = "place-posts-empty";
+      empty.textContent = "Este local ainda não tem publicações no Feed.";
+      postList.append(empty);
+      return;
+    }
     posts.forEach(post => {
       const postCard = document.createElement("article");
       postCard.className = "post-card";
@@ -161,21 +150,29 @@ window.InbarPlaceCard = (() => {
       author.className = "post-author";
       const avatar = document.createElement("span");
       avatar.className = "author-avatar";
-      avatar.textContent = post.user.slice(0, 1).toUpperCase();
+      const authorName = post.authorName || "Usuário";
+      avatar.textContent = authorName.slice(0, 1).toUpperCase();
       const authorInfo = document.createElement("span");
       authorInfo.className = "author-info";
-      authorInfo.append(document.createTextNode(post.user));
+      authorInfo.append(document.createTextNode(authorName));
       const time = document.createElement("small");
-      time.textContent = post.time;
+      time.textContent = post.isExample ? "Publicação demonstrativa" : new Intl.DateTimeFormat("pt-BR", {
+        dateStyle: "medium",
+        timeStyle: "short"
+      }).format(new Date(post.createdAt));
       authorInfo.append(time);
       author.append(avatar, authorInfo);
-      const image = document.createElement("img");
-      image.className = "post-image";
-      image.src = getThumbnailSource(post.image, 360, 180);
-      image.alt = `Publicação demonstrativa de ${post.user}`;
       const caption = document.createElement("p");
-      caption.textContent = post.text;
-      postCard.append(author, image, caption);
+      caption.textContent = post.content;
+      if (post.image) {
+        const image = document.createElement("img");
+        image.className = "post-image";
+        image.src = getThumbnailSource(post.image, 360, 180);
+        image.alt = `Imagem da publicação de ${authorName}`;
+        postCard.append(author, image, caption);
+      } else {
+        postCard.append(author, caption);
+      }
       postList.append(postCard);
     });
   }
