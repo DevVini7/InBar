@@ -81,6 +81,34 @@
     }).join("");
   }
 
+  function renderFavorites() {
+    const list = document.getElementById("profileFavorites");
+    const empty = document.getElementById("profileFavoritesEmpty");
+    try {
+      const favoriteIds = window.InbarFavorites.getFavorites();
+      const favorites = favoriteIds
+        .map(id => window.inbarPlaces.find(place => String(place.id) === id))
+        .filter(Boolean);
+      list.innerHTML = favorites.map(place => {
+        const cover = window.InbarPlaceMedia.getCoverImage(place);
+        const region = place.distance || "Região não informada";
+        const illustrative = window.InbarPlaceMedia.isIllustrative(place);
+        return `<article class="profile-favorite-card">
+          <img src="${escapeHtml(cover)}" alt="${illustrative ? `Imagem ilustrativa de ${escapeHtml(place.name)}` : `Foto de ${escapeHtml(place.name)}`}" loading="lazy">
+          <div><h3>${escapeHtml(place.name)}</h3><p>${escapeHtml(place.category)} · ${escapeHtml(region)}</p></div>
+          <button type="button" class="profile-inline-button" data-open-favorite="${escapeHtml(place.id)}">Ver detalhes</button>
+          <button type="button" class="profile-favorite-remove" data-remove-favorite="${escapeHtml(place.id)}" aria-label="Remover ${escapeHtml(place.name)} dos favoritos">Remover</button>
+        </article>`;
+      }).join("");
+      empty.hidden = favorites.length > 0;
+    } catch (error) {
+      console.error("Não foi possível carregar os locais favoritos.", error);
+      list.replaceChildren();
+      empty.textContent = "Não foi possível carregar os favoritos salvos neste navegador.";
+      empty.hidden = false;
+    }
+  }
+
   function renderInterests() {
     const preferences = window.InbarInterests.loadPreferences();
     const groups = document.getElementById("profileInterestGroups");
@@ -149,6 +177,7 @@
         String(Object.keys(window.InbarRewards.getState().completedMissions).length);
     }
     renderPosts(profilePosts());
+    renderFavorites();
     renderInterests();
     document.getElementById("profileHero").style.setProperty("--profile-accent", appearance.accent);
     document.getElementById("profileHero").style.setProperty("--profile-secondary", appearance.secondary);
@@ -169,6 +198,7 @@
       panel.hidden = panel.dataset.profilePanel !== tab;
     });
     if (tab === "posts") renderPosts(profilePosts());
+    if (tab === "favorites") renderFavorites();
     if (tab === "coupons" && window.InbarRewards) window.InbarRewards.renderCoupons();
   }
 
@@ -209,6 +239,18 @@
     if (tabButton) selectTab(tabButton.dataset.profileTab);
     const tabLink = event.target.closest("[data-profile-tab-link]");
     if (tabLink) selectTab(tabLink.dataset.profileTabLink);
+    const favoritePlace = event.target.closest("[data-open-favorite]");
+    if (favoritePlace) window.InbarNavigation.openExploreDetails(favoritePlace.dataset.openFavorite);
+    const removeFavorite = event.target.closest("[data-remove-favorite]");
+    if (removeFavorite) {
+      try {
+        window.InbarFavorites.toggle(removeFavorite.dataset.removeFavorite);
+      } catch (error) {
+        console.error("Não foi possível remover o local favorito.", error);
+        document.getElementById("profileFavoritesEmpty").textContent =
+          error.message || "Não foi possível atualizar os favoritos.";
+      }
+    }
   });
   document.querySelector(".profile-tabs").addEventListener("keydown", event => {
     if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
@@ -273,6 +315,8 @@
   });
 
   document.getElementById("openFeedFromProfile").addEventListener("click", () => window.InbarNavigation.navigateTo("Feed"));
+  document.getElementById("exploreFavorites").addEventListener("click", () =>
+    window.InbarNavigation.navigateTo("Explorar"));
   document.getElementById("editProfileInterests").addEventListener("click", () => {
     window.location.assign("./onboarding.html?mode=edit");
   });
@@ -283,6 +327,9 @@
     renderPosts(profilePosts());
   });
   window.addEventListener("inbar:profile-updated", render);
+  window.addEventListener("inbar:favorites-updated", () => {
+    if (activeTab === "favorites" && !view.classList.contains("hidden")) renderFavorites();
+  });
   window.addEventListener("inbar:rewards-updated", () => {
     if (window.InbarRewards) {
       document.getElementById("profilePointsBalance").textContent =

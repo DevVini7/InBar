@@ -8,6 +8,9 @@ Projeto front-end em HTML, CSS e JavaScript. O mapa usa Leaflet e tiles cartogr�
 - `onboarding.html`: seleção e personalização de interesses.
 - `js/places.js`: dados demonstrativos dos locais.
 - `js/place-media.js`: capas locais ilustrativas para registros sem foto e para evitar reutilizar a mesma imagem em locais diferentes.
+- `js/place-metadata.js`: metadados adicionais por ID, com data de cadastro e referências verificadas, sem reescrever o catálogo.
+- `js/favorites.js`: favoritos persistidos por perfil neste navegador.
+- `js/explore.js` e `css/explore.css`: busca, filtros, descoberta, classificação cautelosa, detalhes completos, galeria e ações integradas de Explorar.
 - `js/map.js`: criação do mapa, marcadores, navegação e geolocalização.
 - `js/place-card.js`: cartão de detalhes e publicações recentes obtidas do Feed compartilhado.
 - `js/app.js`: filtros, busca e eventos da interface.
@@ -36,6 +39,9 @@ Projeto front-end em HTML, CSS e JavaScript. O mapa usa Leaflet e tiles cartogr�
 - Os 26 registros anteriores de `js/places.js` foram mantidos sem alteração. Foram acrescentados três locais públicos de Brasília (Centro Cultural Banco do Brasil Brasília, Cine Brasília e Parque da Cidade Dona Sarah Kubitschek), com coordenadas consultadas no OpenStreetMap e links para as respectivas referências de mapa.
 - Os mapas do InBar continuam usando Leaflet e tiles do OpenStreetMap; não foi adicionada API de mapas. O projeto deve atribuir dados cartográficos ao OpenStreetMap, conforme a licença ODbL.
 - Quando locais diferentes apontam para a mesma imagem, ou quando uma imagem não está cadastrada, a interface usa uma capa SVG ilustrativa única, com nome/categoria do local. Ela não é uma fotografia do estabelecimento. Os campos originais de imagem dos 26 registros não são substituídos.
+- Explorar usa os mesmos IDs dos 29 locais e oferece busca por nome/região/categoria/características, filtros que têm resultados, ordenação, seções não vazias, detalhes por rota `#explorar/local/<id>`, Feed local e seleção do marcador no mapa. Os favoritos usam `inbar:favorites:v1:<userId>` e aparecem na aba Favoritos do perfil.
+- A classificação “Muito conhecido” requer evidência e fonte verificáveis; “Novo no InBar” usa a data de inclusão no catálogo (não a abertura do estabelecimento); “Vale conhecer” só aparece quando há compatibilidade positiva com interesses/vibe. Sem dados suficientes, a interface mostra “Popularidade ainda não avaliada”. Nenhuma classificação de fama ou avaliação dos registros demonstrativos foi presumida.
+- Apenas o CCBB Brasília e o Cine Brasília têm link de site oficial e descrição complementar conferida nos respectivos canais oficiais. Horários, preços, contatos, acessibilidade e serviços desconhecidos não são inventados. Os campos de avaliação existentes no catálogo são demonstrativos e não são usados para classificar ou ordenar como “mais bem avaliado”.
 - O feed dos locais utiliza as mesmas publicações armazenadas no Feed geral, filtradas por `placeId`. Um local sem publicações mostra estado vazio; a interface não inventa eventos, horários, cardápios ou promoções.
 
 ## Fluxo inicial
@@ -51,6 +57,7 @@ Abra `index.html` na raiz do projeto para iniciar no login. Após enviar credenc
 - Mapa cartográfico real e interativo, centrado no Plano Piloto e enquadrado para mostrar as Asas Norte e Sul, com tratamento escuro em tons de cinza inspirado em mapas de navegação. Arraste para navegar e use a roda do mouse ou os botões +/− para aproximar.
 - Marcadores clicáveis com cores de status. Os detalhes do lugar só aparecem ao selecionar um marcador.
 - O cartão do local pode ser expandido na própria tela HOME para mostrar informações cadastradas e publicações existentes; use "Ver feed do local" para abrir a página compartilhada do local ou "Como chegar" para abrir a rota.
+- Explore lugares em Explorar, refine os resultados por categoria/região, ordene por novidade ou compatibilidade, salve favoritos e abra uma página de detalhes integrada ao Feed e ao mapa. Abrir os detalhes de Explorar não registra visita nem avança missão.
 - Filtros por bares, boates, música ao vivo, eventos, happy hour e hobbies; a busca sugere lugares e aceita nomes, regiões e termos relacionados, sem diferenciar acentos.
 - Marcadores com ícones SVG Lucide distintos para bares, boates, música ao vivo, eventos, boliche e karaokê; o mapa enquadra os pontos cadastrados e ancora cada pin na coordenada do local.
 - Menu de perfil com acesso ao Perfil e à carteira de cupons.

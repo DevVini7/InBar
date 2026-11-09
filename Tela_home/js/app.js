@@ -186,6 +186,13 @@ function setActivePage(page, updateHistory = true) {
       }
       return;
     }
+    if (page === "Explorar" && window.InbarExplore) {
+      window.InbarExplore.showCatalog(false);
+      if (updateHistory && window.location.hash !== "#explorar") {
+        window.history.pushState({ page }, "", "#explorar");
+      }
+      return;
+    }
     if (page === "Mapa") window.InbarMap.resetView();
     return;
   }
@@ -194,6 +201,7 @@ function setActivePage(page, updateHistory = true) {
   searchValues[activePage] = searchInput.value;
   activePage = page;
   if (page === "Feed" && window.InbarFeed) window.InbarFeed.showGeneralFeed();
+  if (page === "Explorar" && window.InbarExplore) window.InbarExplore.showCatalog(false);
   searchInput.value = searchValues[page];
   searchInput.dispatchEvent(new Event("input", { bubbles: true }));
 
@@ -209,7 +217,8 @@ function setActivePage(page, updateHistory = true) {
   document.getElementById("profileView").classList.toggle("hidden", !profileVisible);
   searchInput.placeholder = missionsVisible ? "Buscar missões..."
     : feedVisible ? "Buscar publicações e lugares..."
-      : "Buscar lugares, bairros...";
+      : exploreVisible ? "Buscar nome, região, categoria ou experiência..."
+        : "Buscar lugares, bairros...";
   document.title = `InBar — ${page}`;
   document.getElementById("clearSearch").style.display = "";
   document.getElementById("searchResults").classList.add("hidden");
@@ -231,42 +240,15 @@ function setActivePage(page, updateHistory = true) {
 }
 
 function renderExplore() {
-  const view = document.getElementById("exploreView");
-  const query = normalizeText(document.getElementById("searchInput").value.trim());
-  const matches = places.filter(place => {
-    const searchable = normalizeText(`${place.name} ${place.distance} ${place.desc} ${place.types.join(" ")} ${(place.searchTerms || []).join(" ")}`);
-    return !query || searchable.includes(query);
-  });
-  const ranked = window.InbarRecommendations
-    ? window.InbarRecommendations.rankPlaces(matches)
-    : matches.map(entity => ({ entity, score: 0 }));
-  const orderedMatches = ranked.map(item => item.entity);
-  const vibe = window.InbarVibe && window.InbarVibe.getCurrent();
-  const sortedByRelevance = ranked.some(item => item.score > 0);
-  view.innerHTML = `<div class="explore-layout">
-    <header class="explore-heading">
-      <div><p class="feed-kicker">ENCONTRE SEU PRÓXIMO ROLÊ</p><h1>Explorar</h1><p>${vibe ? `Prioridade para: ${escapeHtml(vibe.label)}. ` : ""}${sortedByRelevance ? "Sugestões priorizadas pelos seus interesses e pela vibe desta sessão." : "Descubra os lugares cadastrados no InBar e veja seus detalhes no mapa."}</p></div>
-      <span class="explore-count">${matches.length} ${matches.length === 1 ? "lugar" : "lugares"}</span>
-    </header>
-    <section class="explore-grid" aria-label="Lugares cadastrados">
-      ${orderedMatches.map(place => `<article class="explore-card">
-        <img src="${escapeHtml(window.InbarPlaceMedia.getCoverImage(place))}" alt="${window.InbarPlaceMedia.isIllustrative(place) ? `Imagem ilustrativa de ${escapeHtml(place.name)}; foto não disponível` : `Ambiente de ${escapeHtml(place.name)}`}" data-place-image="${place.id}" loading="lazy">
-        <div class="explore-card-body">
-          <div class="explore-card-title"><h2>${escapeHtml(place.name)}</h2><span>${escapeHtml(place.category)}</span></div>
-          <p>${escapeHtml(place.desc)}</p>
-          <div class="explore-tags">${place.types.map(type => `<span>${escapeHtml(type)}</span>`).join("")}</div>
-          <button type="button" class="explore-place-button" data-open-place="${escapeHtml(place.id)}">Ver no mapa <span aria-hidden="true">→</span></button>
-        </div>
-      </article>`).join("")}
-      ${matches.length ? "" : '<p class="explore-empty">Nenhum lugar encontrado. Tente outra busca.</p>'}
-    </section>
-  </div>`;
+  window.InbarExplore.render();
 }
 
 function routeFromHash() {
   const route = window.location.hash.replace(/^#\/?/, "").toLocaleLowerCase("pt-BR");
   const localFeed = route.match(/^feed\/local\/(\d+)$/);
   if (localFeed) return { page: "Feed", placeId: Number(localFeed[1]) };
+  const placeDetail = route.match(/^explorar\/local\/(\d+)$/);
+  if (placeDetail) return { page: "Explorar", placeId: Number(placeDetail[1]) };
   return {
     page: route === "missions" || route === "feed" || route === "explorar" || route === "perfil" ? {
       missions: "Missões",
@@ -349,16 +331,6 @@ function setupEvents() {
       setActivePage(button.dataset.page);
     });
   });
-  document.getElementById("exploreView").addEventListener("click", event => {
-    const button = event.target.closest("[data-open-place]");
-    if (button) window.InbarNavigation.openPlace(Number(button.dataset.openPlace));
-  });
-  document.getElementById("exploreView").addEventListener("error", event => {
-    const image = event.target.closest("[data-place-image]");
-    if (!image) return;
-    const place = places.find(item => String(item.id) === image.dataset.placeImage);
-    if (place) window.InbarPlaceMedia.applyFallback(image, place);
-  }, true);
   document.getElementById("homeRecommendationsList").addEventListener("click", event => {
     const button = event.target.closest("[data-open-place]");
     if (button) window.InbarNavigation.openPlace(Number(button.dataset.openPlace));
@@ -387,6 +359,13 @@ function setupEvents() {
         setActivePage("Feed", false);
         showToast("Este local não está mais disponível no catálogo.");
       }
+    } else if (route.page === "Explorar" && route.placeId !== null) {
+      if (!window.InbarExplore.openDetails(route.placeId, false)) {
+        window.InbarExplore.showCatalog(false);
+        showToast("Este local não está mais disponível no catálogo.");
+      }
+    } else if (route.page === "Explorar") {
+      window.InbarExplore.showCatalog(false);
     }
   };
   window.addEventListener("popstate", syncNavigation);
@@ -443,6 +422,11 @@ function setupEvents() {
 
 window.InbarNavigation = {
   navigateTo: setActivePage,
+  openExploreDetails(id) {
+    if (!places.some(place => String(place.id) === String(id))) return;
+    setActivePage("Explorar", false);
+    window.InbarExplore.openDetails(id);
+  },
   openPlaceFeed(id) {
     if (!places.some(place => place.id === id)) return;
     setActivePage("Feed", false);
@@ -478,6 +462,11 @@ if (window.location.hash) {
   const route = routeFromHash();
   setActivePage(route.page, false);
   if (route.page === "Feed" && route.placeId !== null && !window.InbarFeed.filterByPlace(route.placeId)) {
+    showToast("Este local não está mais disponível no catálogo.");
+  }
+  if (route.page === "Explorar" && route.placeId !== null
+    && !window.InbarExplore.openDetails(route.placeId, false)) {
+    window.InbarExplore.showCatalog(false);
     showToast("Este local não está mais disponível no catálogo.");
   }
 }

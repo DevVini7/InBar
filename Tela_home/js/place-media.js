@@ -4,9 +4,15 @@ window.InbarPlaceMedia = (() => {
   const imageCounts = new Map();
 
   (window.inbarPlaces || []).forEach(place => {
-    const source = place.coverImage || place.image || "";
-    if (!source) return;
-    imageCounts.set(source, (imageCounts.get(source) || 0) + 1);
+    const sources = [
+      place.coverImage,
+      place.image,
+      ...(Array.isArray(place.gallery) ? place.gallery : []),
+      ...(Array.isArray(place.images) ? place.images : [])
+    ];
+    [...new Set(sources.filter(Boolean))].forEach(source => {
+      imageCounts.set(source, (imageCounts.get(source) || 0) + 1);
+    });
   });
   imageCounts.forEach((count, source) => {
     if (count > 1) duplicateImageUrls.add(source);
@@ -34,13 +40,33 @@ window.InbarPlaceMedia = (() => {
   }
 
   function getCoverImage(place) {
-    const source = place.coverImage || place.image || "";
-    return source && !duplicateImageUrls.has(source) ? source : fallback(place);
+    const sources = [
+      place.coverImage,
+      place.image,
+      ...(Array.isArray(place.gallery) ? place.gallery : []),
+      ...(Array.isArray(place.images) ? place.images : [])
+    ];
+    return sources.find(source => source && !duplicateImageUrls.has(source)) || fallback(place);
+  }
+
+  function getGalleryImages(place) {
+    const sources = [...new Set([
+      getCoverImage(place),
+      ...(Array.isArray(place.gallery) ? place.gallery : []),
+      ...(Array.isArray(place.images) ? place.images : [])
+    ].filter(source => typeof source === "string" && source && !duplicateImageUrls.has(source)))];
+    return sources.length ? sources : [fallback(place)];
   }
 
   function isIllustrative(place) {
-    const source = place.coverImage || place.image || "";
-    return Boolean(place.imageIsIllustrative || !source || duplicateImageUrls.has(source));
+    const sources = [
+      place.coverImage,
+      place.image,
+      ...(Array.isArray(place.gallery) ? place.gallery : []),
+      ...(Array.isArray(place.images) ? place.images : [])
+    ];
+    return Boolean(place.imageIsIllustrative
+      || !sources.some(source => source && !duplicateImageUrls.has(source)));
   }
 
   function applyFallback(image, place) {
@@ -50,5 +76,5 @@ window.InbarPlaceMedia = (() => {
     image.alt = `Imagem ilustrativa de ${place.name}; foto não disponível`;
   }
 
-  return { getCoverImage, isIllustrative, applyFallback };
+  return { getCoverImage, getGalleryImages, isIllustrative, applyFallback };
 })();
