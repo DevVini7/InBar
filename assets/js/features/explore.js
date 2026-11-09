@@ -177,7 +177,7 @@ window.InbarExplore = (() => {
     return `<button type="button" class="explore-favorite${favorite ? " is-favorite" : ""}"
       data-explore-favorite="${escapeHtml(place.id)}" aria-pressed="${favorite}"
       aria-label="${favorite ? "Remover" : "Adicionar"} ${escapeHtml(place.name)} ${favorite ? "dos" : "aos"} favoritos">
-      <svg class="icon" aria-hidden="true"><use href="assets/icons.svg#heart"></use></svg>
+      <svg class="icon" aria-hidden="true"><use href="assets/icons/inbar.svg#heart"></use></svg>
     </button>`;
   }
 
@@ -200,7 +200,7 @@ window.InbarExplore = (() => {
         <p class="explore-place-description">${escapeHtml(place.desc || "Descrição ainda não cadastrada.")}</p>
         <div class="explore-tags">${(place.types || []).slice(0, 4).map(type => `<span>${escapeHtml(type)}</span>`).join("")}</div>
         <button type="button" class="explore-place-button" data-open-place-detail="${escapeHtml(place.id)}">Ver detalhes
-          <svg class="icon" aria-hidden="true"><use href="assets/icons.svg#arrow-right"></use></svg>
+          <svg class="icon" aria-hidden="true"><use href="assets/icons/inbar.svg#arrow-right"></use></svg>
         </button>
       </div>
     </article>`;
@@ -287,7 +287,7 @@ window.InbarExplore = (() => {
     const rating = verifiedRating(place);
     view.innerHTML = `<article class="explore-detail" data-detail-place="${escapeHtml(place.id)}">
       <button type="button" class="explore-back-button" data-explore-action="back">
-        <svg class="icon" aria-hidden="true"><use href="assets/icons.svg#arrow-left"></use></svg>Voltar aos lugares
+        <svg class="icon" aria-hidden="true"><use href="assets/icons/inbar.svg#arrow-left"></use></svg>Voltar aos lugares
       </button>
       <section class="explore-detail-hero">
         <div class="explore-detail-gallery">
@@ -303,7 +303,7 @@ window.InbarExplore = (() => {
           <span class="explore-place-badge is-${popularity.kind}" title="${escapeHtml(popularity.detail || popularity.label)}">${escapeHtml(popularity.label)}</span>
           <p class="explore-eyebrow">${escapeHtml(place.category || "Local")}</p>
           <h1>${escapeHtml(place.name)}</h1>
-          <p class="explore-detail-location"><svg class="icon" aria-hidden="true"><use href="assets/icons.svg#map-pin"></use></svg>${escapeHtml(location)}</p>
+          <p class="explore-detail-location"><svg class="icon" aria-hidden="true"><use href="assets/icons/inbar.svg#map-pin"></use></svg>${escapeHtml(location)}</p>
           <p class="explore-detail-description">${escapeHtml(metadata.verifiedDescription || place.desc || "Descrição ainda não cadastrada.")}</p>
           ${!verified ? '<p class="explore-data-note">Descrição de cadastro demonstrativo; detalhes e funcionamento não foram confirmados.</p>' : ""}
           ${illustrative ? '<p class="explore-image-note">Imagem ilustrativa: foto própria deste local não disponível.</p>' : ""}
@@ -351,14 +351,14 @@ window.InbarExplore = (() => {
     state.detailId = String(place.id);
     renderDetails(state.detailId);
     if (updateHistory) window.history.pushState({ page: "Explorar", placeId: place.id },
-      "", `#explorar/local/${encodeURIComponent(place.id)}`);
+      "", `pages/app/index.html#explorar/local/${encodeURIComponent(place.id)}`);
     return true;
   }
 
   function showCatalog(updateHistory = true) {
     state.detailId = null;
     renderCatalog();
-    if (updateHistory) window.history.replaceState({ page: "Explorar" }, "", "#explorar");
+    if (updateHistory) window.history.replaceState({ page: "Explorar" }, "", "pages/app/index.html#explorar");
   }
 
   function setupEvents() {

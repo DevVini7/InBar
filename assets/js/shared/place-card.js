@@ -11,7 +11,7 @@ window.InbarPlaceCard = (() => {
     icon.classList.add("icon");
     icon.setAttribute("aria-hidden", "true");
     icon.setAttribute("focusable", "false");
-    use.setAttribute("href", `assets/icons.svg#${name}`);
+    use.setAttribute("href", `assets/icons/inbar.svg#${name}`);
     icon.append(use);
     return icon;
   }

@@ -70,7 +70,7 @@ function renderSearchResults() {
     const use = document.createElementNS("http://www.w3.org/2000/svg", "use");
     icon.classList.add("icon");
     icon.setAttribute("aria-hidden", "true");
-    use.setAttribute("href", `assets/icons.svg#${place.icon || "map-pin"}`);
+    use.setAttribute("href", `assets/icons/inbar.svg#${place.icon || "map-pin"}`);
     icon.append(use);
     const details = document.createElement("span");
     details.className = "search-result-details";
@@ -182,14 +182,14 @@ function setActivePage(page, updateHistory = true) {
     if (page === "Feed" && window.InbarFeed) {
       window.InbarFeed.showGeneralFeed();
       if (updateHistory && window.location.hash !== "#feed") {
-        window.history.pushState({ page }, "", "#feed");
+        window.history.pushState({ page }, "", "pages/app/index.html#feed");
       }
       return;
     }
     if (page === "Explorar" && window.InbarExplore) {
       window.InbarExplore.showCatalog(false);
       if (updateHistory && window.location.hash !== "#explorar") {
-        window.history.pushState({ page }, "", "#explorar");
+        window.history.pushState({ page }, "", "pages/app/index.html#explorar");
       }
       return;
     }
@@ -235,7 +235,7 @@ function setActivePage(page, updateHistory = true) {
 
   if (updateHistory) {
     const route = { "Mapa": "", "Explorar": "#explorar", "Feed": "#feed", "Missões": "#missions", "Perfil": "#perfil" }[page];
-    window.history.pushState({ page }, "", route || "#");
+    window.history.pushState({ page }, "", `pages/app/index.html${route || "#"}`);
   }
 }
 
@@ -263,7 +263,7 @@ function routeFromHash() {
 function setupProfile() {
   const currentUser = window.InbarAuth.getCurrentUser();
   if (!currentUser) {
-    window.location.replace("login.html");
+    window.location.replace("pages/auth/login.html");
     return;
   }
 
@@ -374,7 +374,7 @@ function setupEvents() {
   document.getElementById("signOutButton").addEventListener("click", () => {
     try {
       window.InbarAuth.logout();
-      window.location.replace("login.html");
+      window.location.replace("pages/auth/login.html");
     } catch (error) {
       console.error("Não foi possível encerrar a sessão do InBar.", error);
       showToast("Não foi possível sair. Verifique o armazenamento do navegador e tente novamente.");
@@ -382,7 +382,7 @@ function setupEvents() {
   });
   document.getElementById("editPreferences").addEventListener("click", () => {
     closeProfileMenu();
-    window.location.assign("./onboarding.html?mode=edit");
+    window.location.assign("pages/auth/onboarding.html?mode=edit");
   });
   document.getElementById("openProfile").addEventListener("click", () => {
     closeProfileMenu();
@@ -434,7 +434,8 @@ window.InbarNavigation = {
       showToast("Não foi possível carregar o Feed deste local.");
       return;
     }
-    window.history.pushState({ page: "Feed", placeId: id }, "", `#feed/local/${encodeURIComponent(id)}`);
+    window.history.pushState({ page: "Feed", placeId: id }, "",
+      `pages/app/index.html#feed/local/${encodeURIComponent(id)}`);
   },
   openPlace(id) {
     if (!places.some(place => place.id === id)) return;

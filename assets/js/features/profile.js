@@ -41,7 +41,7 @@
     const use = document.createElementNS("http://www.w3.org/2000/svg", "use");
     svg.setAttribute("class", "icon");
     svg.setAttribute("aria-hidden", "true");
-    use.setAttribute("href", `assets/icons.svg#${preset}`);
+    use.setAttribute("href", `assets/icons/inbar.svg#${preset}`);
     svg.append(use);
     return svg;
   }
@@ -150,7 +150,7 @@
   function render() {
     const user = window.InbarAuth.getCurrentUser();
     if (!user) {
-      window.location.replace("login.html");
+      window.location.replace("pages/auth/login.html");
       return;
     }
     const nickname = user.displayName || user.nickname || user.username || user.fullName || "Usuário";
@@ -318,7 +318,7 @@
   document.getElementById("exploreFavorites").addEventListener("click", () =>
     window.InbarNavigation.navigateTo("Explorar"));
   document.getElementById("editProfileInterests").addEventListener("click", () => {
-    window.location.assign("./onboarding.html?mode=edit");
+    window.location.assign("pages/auth/onboarding.html?mode=edit");
   });
   document.getElementById("openMissionsFromProfile").addEventListener("click", () => window.InbarNavigation.navigateTo("Missões"));
   document.getElementById("openProfileAppearance").addEventListener("click", () => window.InbarProfileAppearance.openEditor());

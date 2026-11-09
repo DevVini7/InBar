@@ -39,8 +39,8 @@
 
   function postCard(post, index) {
     const venue = venueFor(post.venueId);
-    const authorPath = `#/perfil/${encodeURIComponent(slugify(post.author))}`;
-    const venuePath = `#/estabelecimento/${encodeURIComponent(post.venueId)}`;
+    const authorPath = `pages/prototypes/feed/index.html#/perfil/${encodeURIComponent(slugify(post.author))}`;
+    const venuePath = `pages/prototypes/feed/index.html#/estabelecimento/${encodeURIComponent(post.venueId)}`;
     const searchText = `${post.author} ${venue?.name || ''} ${venue?.category || ''} ${post.message}`.toLocaleLowerCase('pt-BR');
     return `<article class="post-card" data-post-card="${escapeHtml(post.id)}" data-type="${escapeHtml(post.type)}" data-search="${escapeHtml(searchText)}" style="animation-delay:${Math.min(index, 8) * 35}ms">
       <div class="post-main">
@@ -119,7 +119,7 @@
   }
 
   function renderVenueDiscovery() {
-    return data.venues.slice(0, 4).map((venue) => `<a class="discovery-venue" href="#/estabelecimento/${encodeURIComponent(venue.id)}">
+    return data.venues.slice(0, 4).map((venue) => `<a class="discovery-venue" href="pages/prototypes/feed/index.html#/estabelecimento/${encodeURIComponent(venue.id)}">
       <img src="${escapeHtml(venue.image)}" alt="" loading="lazy"><div><strong>${escapeHtml(venue.name)}</strong><span>${escapeHtml(venue.category)} · ${escapeHtml(venue.area)}</span></div>
     </a>`).join('');
   }
@@ -140,10 +140,10 @@
         <section class="side-panel">
           <div class="panel-heading"><h2>Pessoas próximas</h2><span class="live-label"><i class="live-dot"></i> Demonstração</span></div>
           <div class="people-list">${renderPeople()}</div>
-          <div class="panel-foot"><a class="text-button" href="#/pessoas">Ver todos <i class="fa-solid fa-arrow-right"></i></a></div>
+          <div class="panel-foot"><a class="text-button" href="pages/prototypes/feed/index.html#/pessoas">Ver todos <i class="fa-solid fa-arrow-right"></i></a></div>
           <p class="privacy-note">Atividade e distâncias fictícias para demonstração. O Inbar não rastreia a localização de pessoas.</p>
         </section>
-        <section class="side-panel discovery-panel"><h2>Descubra lugares</h2>${renderVenueDiscovery()}<div class="panel-foot"><a class="text-button" href="#/explorar">Explorar estabelecimentos <i class="fa-solid fa-arrow-right"></i></a></div></section>
+        <section class="side-panel discovery-panel"><h2>Descubra lugares</h2>${renderVenueDiscovery()}<div class="panel-foot"><a class="text-button" href="pages/prototypes/feed/index.html#/explorar">Explorar estabelecimentos <i class="fa-solid fa-arrow-right"></i></a></div></section>
       </aside>
     </div>`;
     renderPosts();
@@ -163,12 +163,12 @@
     const query = state.search;
     const venues = data.venues.filter((venue) => `${venue.name} ${venue.category} ${venue.area} ${venue.description}`.toLocaleLowerCase('pt-BR').includes(query));
     app.innerHTML = `<section class="destination-heading"><p class="eyebrow">Encontre seu próximo lugar</p><h1>Explorar</h1><p>Bares, lounges, restaurantes e música ao vivo em Brasília.</p></section>
-      <section class="destination-grid">${venues.map((venue) => `<a class="destination-card" href="#/estabelecimento/${encodeURIComponent(venue.id)}"><img src="${escapeHtml(venue.image)}" alt="Ambiente de ${escapeHtml(venue.name)}" loading="lazy"><div class="destination-card-body"><h2>${escapeHtml(venue.name)}</h2><p>${escapeHtml(venue.category)} · ${escapeHtml(venue.area)}<br>${escapeHtml(venue.description)}</p></div></a>`).join('') || '<p class="empty-state">Nenhum estabelecimento encontrado.</p>'}</section>`;
+      <section class="destination-grid">${venues.map((venue) => `<a class="destination-card" href="pages/prototypes/feed/index.html#/estabelecimento/${encodeURIComponent(venue.id)}"><img src="${escapeHtml(venue.image)}" alt="Ambiente de ${escapeHtml(venue.name)}" loading="lazy"><div class="destination-card-body"><h2>${escapeHtml(venue.name)}</h2><p>${escapeHtml(venue.category)} · ${escapeHtml(venue.area)}<br>${escapeHtml(venue.description)}</p></div></a>`).join('') || '<p class="empty-state">Nenhum estabelecimento encontrado.</p>'}</section>`;
   }
 
   function renderMap() {
     app.innerHTML = `<section class="destination-heading"><p class="eyebrow">Locais demonstrativos</p><h1>Mapa</h1><p>Explore os estabelecimentos cadastrados. Esta demonstração não utiliza GPS nem apresenta localização em tempo real.</p></section>
-      <section class="destination-grid">${data.venues.map((venue) => `<a class="destination-card" href="#/estabelecimento/${encodeURIComponent(venue.id)}"><img src="${escapeHtml(venue.image)}" alt="Ambiente de ${escapeHtml(venue.name)}" loading="lazy"><div class="destination-card-body"><h2><i class="fa-solid fa-location-dot" style="color:#c68afa;margin-right:5px"></i>${escapeHtml(venue.name)}</h2><p>${escapeHtml(venue.category)} · ${escapeHtml(venue.area)}</p></div></a>`).join('')}</section>`;
+      <section class="destination-grid">${data.venues.map((venue) => `<a class="destination-card" href="pages/prototypes/feed/index.html#/estabelecimento/${encodeURIComponent(venue.id)}"><img src="${escapeHtml(venue.image)}" alt="Ambiente de ${escapeHtml(venue.name)}" loading="lazy"><div class="destination-card-body"><h2><i class="fa-solid fa-location-dot" style="color:#c68afa;margin-right:5px"></i>${escapeHtml(venue.name)}</h2><p>${escapeHtml(venue.category)} · ${escapeHtml(venue.area)}</p></div></a>`).join('')}</section>`;
   }
 
   function renderMissions() {
@@ -192,17 +192,17 @@
     const posts = state.posts.filter((post) => slugify(post.author) === id);
     const author = isAdmin ? 'ADM INBAR' : person?.name || posts[0]?.author || (id === 'voce' ? 'Você' : null);
     if (!author) return renderNotFound();
-    const avatar = isAdmin ? 'assets/adm-inbar-perfil.jpg' : person?.avatar || posts[0]?.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=160&q=85';
+    const avatar = isAdmin ? 'assets/images/prototypes/adm-inbar-perfil.jpg' : person?.avatar || posts[0]?.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=160&q=85';
     app.innerHTML = `<section class="destination-heading"><p class="eyebrow">${isAdmin ? 'Conta administrativa' : 'Perfil demonstrativo'}</p><div style="display:flex;align-items:center;gap:14px;margin-bottom:12px"><img class="avatar" style="width:58px;height:58px" src="${escapeHtml(avatar)}" alt="Foto de ${escapeHtml(author)}"><h1 style="margin:0">${escapeHtml(author)}</h1></div><p>${isAdmin ? 'Perfil administrativo da plataforma INBAR.' : 'Perfil de demonstração do Inbar. As publicações abaixo são conteúdo fictício.'}</p></section>
       <h2 style="font:700 15px Manrope,sans-serif;margin:0 0 14px">Publicações</h2><section class="posts-grid">${posts.length ? posts.map(postCard).join('') : '<p class="empty-state">Este perfil ainda não tem publicações demonstrativas.</p>'}</section>`;
   }
 
   function renderHome() {
-    app.innerHTML = `<section class="destination-heading"><p class="eyebrow">Descubra Brasília</p><h1>inbar</h1><p>Seu próximo lugar favorito começa aqui. Explore o feed e encontre o que está acontecendo.</p><a class="button button-primary" style="margin-top:16px" href="#/feed"><i class="fa-solid fa-bolt"></i>Ir para o Feed</a></section><section class="destination-grid">${data.venues.slice(0, 3).map((venue) => `<a class="destination-card" href="#/estabelecimento/${encodeURIComponent(venue.id)}"><img src="${escapeHtml(venue.image)}" alt="Ambiente de ${escapeHtml(venue.name)}"><div class="destination-card-body"><h2>${escapeHtml(venue.name)}</h2><p>${escapeHtml(venue.category)} · ${escapeHtml(venue.area)}</p></div></a>`).join('')}</section>`;
+    app.innerHTML = `<section class="destination-heading"><p class="eyebrow">Descubra Brasília</p><h1>inbar</h1><p>Seu próximo lugar favorito começa aqui. Explore o feed e encontre o que está acontecendo.</p><a class="button button-primary" style="margin-top:16px" href="pages/prototypes/feed/index.html#/feed"><i class="fa-solid fa-bolt"></i>Ir para o Feed</a></section><section class="destination-grid">${data.venues.slice(0, 3).map((venue) => `<a class="destination-card" href="pages/prototypes/feed/index.html#/estabelecimento/${encodeURIComponent(venue.id)}"><img src="${escapeHtml(venue.image)}" alt="Ambiente de ${escapeHtml(venue.name)}"><div class="destination-card-body"><h2>${escapeHtml(venue.name)}</h2><p>${escapeHtml(venue.category)} · ${escapeHtml(venue.area)}</p></div></a>`).join('')}</section>`;
   }
 
   function renderNotFound() {
-    app.innerHTML = '<section class="destination-heading"><p class="eyebrow">Página não encontrada</p><h1>Esse caminho não existe</h1><p>Volte ao feed para continuar explorando.</p><a class="button button-primary" style="margin-top:16px" href="#/feed">Abrir Feed</a></section>';
+    app.innerHTML = '<section class="destination-heading"><p class="eyebrow">Página não encontrada</p><h1>Esse caminho não existe</h1><p>Volte ao feed para continuar explorando.</p><a class="button button-primary" style="margin-top:16px" href="pages/prototypes/feed/index.html#/feed">Abrir Feed</a></section>';
   }
 
   function renderRoute() {

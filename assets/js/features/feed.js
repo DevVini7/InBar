@@ -253,7 +253,7 @@
     const likeCount = post.baseLikes + post.likes.length;
     const placeMarkup = place
       ? `<button type="button" class="feed-place-link" data-feed-action="open-place" data-place-id="${place.id}">
-          <svg class="icon" aria-hidden="true"><use href="assets/icons.svg#map-pin"></use></svg>
+          <svg class="icon" aria-hidden="true"><use href="assets/icons/inbar.svg#map-pin"></use></svg>
           ${escapeHtml(place.name)} <span>· ${escapeHtml(place.distance)}</span>
         </button>`
       : "";
@@ -264,11 +264,11 @@
       ? `<img class="feed-avatar" src="${escapeHtml(currentUser.profileAppearance.avatar)}" alt="" loading="lazy">`
       : post.isExample && post.avatar
       ? `<img class="feed-avatar" src="${escapeHtml(post.avatar)}" alt="" loading="lazy">`
-      : `<span class="feed-avatar feed-avatar-placeholder" aria-hidden="true"><svg class="icon"><use href="assets/icons.svg#${ownsPost ? currentUser?.profileAppearance?.avatarPreset || "user-round" : "user-round"}"></use></svg></span>`;
+      : `<span class="feed-avatar feed-avatar-placeholder" aria-hidden="true"><svg class="icon"><use href="assets/icons/inbar.svg#${ownsPost ? currentUser?.profileAppearance?.avatarPreset || "user-round" : "user-round"}"></use></svg></span>`;
     const authorName = ownsPost ? currentUser.displayName || currentUser.nickname || post.authorName : post.authorName;
     const menuMarkup = ownsPost
       ? `<details class="feed-post-menu">
-          <summary aria-label="Opções da publicação"><svg class="icon" aria-hidden="true"><use href="assets/icons.svg#ellipsis"></use></svg></summary>
+          <summary aria-label="Opções da publicação"><svg class="icon" aria-hidden="true"><use href="assets/icons/inbar.svg#ellipsis"></use></svg></summary>
           <div class="feed-post-menu-popover"><button type="button" data-feed-action="delete" data-post-id="${escapeHtml(post.id)}">Excluir publicação</button></div>
         </details>`
       : "";
@@ -292,15 +292,15 @@
       ${placeMarkup}
       <footer class="feed-post-actions">
         <button type="button" class="feed-action-button${liked ? " is-liked" : ""}" data-feed-action="like" data-post-id="${escapeHtml(post.id)}" aria-pressed="${liked}">
-          <svg class="icon" aria-hidden="true"><use href="assets/icons.svg#heart"></use></svg>
+          <svg class="icon" aria-hidden="true"><use href="assets/icons/inbar.svg#heart"></use></svg>
           <span>${likeCount}</span>
         </button>
         <button type="button" class="feed-action-button" data-feed-action="comments" data-post-id="${escapeHtml(post.id)}">
-          <svg class="icon" aria-hidden="true"><use href="assets/icons.svg#message-circle"></use></svg>
+          <svg class="icon" aria-hidden="true"><use href="assets/icons/inbar.svg#message-circle"></use></svg>
           <span>${escapeHtml(renderCommentsCount(post))}</span>
         </button>
         <button type="button" class="feed-action-button" data-feed-action="share" data-post-id="${escapeHtml(post.id)}">
-          <svg class="icon" aria-hidden="true"><use href="assets/icons.svg#share-2"></use></svg>
+          <svg class="icon" aria-hidden="true"><use href="assets/icons/inbar.svg#share-2"></use></svg>
           <span>Compartilhar</span>
         </button>
       </footer>
@@ -323,7 +323,7 @@
     }
     document.getElementById("feedPlaceList").innerHTML = featuredPlaces.map(place => `
       <article class="feed-place-item">
-        <span class="feed-place-icon" aria-hidden="true"><svg class="icon"><use href="assets/icons.svg#${escapeHtml(place.icon || "map-pin")}"></use></svg></span>
+        <span class="feed-place-icon" aria-hidden="true"><svg class="icon"><use href="assets/icons/inbar.svg#${escapeHtml(place.icon || "map-pin")}"></use></svg></span>
         <div><strong>${escapeHtml(place.name)}</strong><span>${escapeHtml(place.category)} · ${escapeHtml(place.distance)}</span></div>
         <button type="button" data-feed-action="open-place-feed" data-place-id="${place.id}" aria-label="Abrir o Feed de ${escapeHtml(place.name)}">Feed</button>
       </article>`).join("");
@@ -368,7 +368,7 @@
       ? post.comments.map(comment => `<article class="feed-comment">
           ${comment.authorId === currentUser.id && currentUser.profileAppearance?.avatar
             ? `<img class="feed-avatar" src="${escapeHtml(currentUser.profileAppearance.avatar)}" alt="" loading="lazy">`
-            : `<span class="feed-avatar feed-avatar-placeholder" aria-hidden="true"><svg class="icon"><use href="assets/icons.svg#${comment.authorId === currentUser.id ? currentUser.profileAppearance?.avatarPreset || "user-round" : "user-round"}"></use></svg></span>`}
+            : `<span class="feed-avatar feed-avatar-placeholder" aria-hidden="true"><svg class="icon"><use href="assets/icons/inbar.svg#${comment.authorId === currentUser.id ? currentUser.profileAppearance?.avatarPreset || "user-round" : "user-round"}"></use></svg></span>`}
           <div><strong>${escapeHtml(comment.authorId === currentUser.id ? currentUser.displayName || currentUser.nickname || comment.authorName : comment.authorName)}</strong><p>${escapeHtml(comment.content)}</p></div>
         </article>`).join("")
       : '<p class="feed-comments-empty">Ainda não há comentários. Comece a conversa.</p>';

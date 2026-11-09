@@ -32,7 +32,7 @@
     const use = document.createElementNS("http://www.w3.org/2000/svg", "use");
     svg.setAttribute("class", "icon");
     svg.setAttribute("aria-hidden", "true");
-    use.setAttribute("href", `assets/icons.svg#${preset}`);
+    use.setAttribute("href", `assets/icons/inbar.svg#${preset}`);
     svg.append(use);
     return svg;
   }

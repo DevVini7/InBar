@@ -56,7 +56,7 @@
       const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
       const use = document.createElementNS("http://www.w3.org/2000/svg", "use");
       svg.setAttribute("aria-hidden", "true");
-      use.setAttribute("href", `assets/icons.svg#${category.icon}`);
+      use.setAttribute("href", `assets/icons/inbar.svg#${category.icon}`);
       svg.append(use);
       icon.append(svg);
       const label = document.createElement("strong");
@@ -200,7 +200,7 @@
   function saveAndReturn(categoryIds, interestIds) {
     try {
       window.InbarInterests.savePreferences(categoryIds, interestIds);
-      window.location.assign("./index.html");
+      window.location.assign("pages/app/index.html");
     } catch (error) {
       console.error("Falha ao salvar as preferências do InBar.", error);
       status.textContent = "Não foi possível salvar suas escolhas. Verifique o armazenamento do navegador e tente novamente.";
@@ -227,12 +227,12 @@
 
   skipButton.addEventListener("click", () => {
     if (editing) {
-      window.location.assign("./index.html");
+      window.location.assign("pages/app/index.html");
       return;
     }
     try {
       window.InbarAuth.logout();
-      window.location.replace("./login.html");
+      window.location.replace("pages/auth/login.html");
     } catch (error) {
       console.error("Não foi possível encerrar a sessão do InBar.", error);
       status.textContent = "Não foi possível sair. Verifique o armazenamento do navegador e tente novamente.";

@@ -359,7 +359,7 @@
       const buttonText = alreadyClaimed ? "Já resgatado"
         : enoughPoints ? "Resgatar demonstração" : `Faltam ${displayPoints(reward.cost - balance)} pontos`;
       return `<article class="reward-card" data-reward-id="${reward.id}">
-        <div class="reward-illustration" aria-hidden="true"><span><svg class="icon"><use href="assets/icons.svg#${escapeHtml(reward.icon)}"></use></svg><small>IMAGEM ILUSTRATIVA</small></span></div>
+        <div class="reward-illustration" aria-hidden="true"><span><svg class="icon"><use href="assets/icons/inbar.svg#${escapeHtml(reward.icon)}"></use></svg><small>IMAGEM ILUSTRATIVA</small></span></div>
         <div class="reward-card-heading"><p class="reward-category">${escapeHtml(reward.category)}</p><span class="mission-status">Demonstração</span></div>
         <h3>${escapeHtml(reward.name)}</h3>
         <p>${escapeHtml(reward.description)}</p>

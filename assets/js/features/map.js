@@ -94,7 +94,7 @@ window.InbarMap = (() => {
       const use = document.createElementNS("http://www.w3.org/2000/svg", "use");
       markerIcon.classList.add("icon");
       markerIcon.setAttribute("aria-hidden", "true");
-      use.setAttribute("href", `assets/icons.svg#${place.icon || "map-pin"}`);
+      use.setAttribute("href", `assets/icons/inbar.svg#${place.icon || "map-pin"}`);
       markerIcon.append(use);
       const pin = document.createElement("span");
       pin.className = "marker-pin";

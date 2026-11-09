@@ -56,7 +56,8 @@
   function redirectAuthenticatedUser() {
     const currentUser = window.InbarAuth.getCurrentUser();
     if (!currentUser) return false;
-    const destination = window.InbarInterests.requiresOnboarding() ? "onboarding.html" : "index.html";
+    const destination = window.InbarInterests.requiresOnboarding()
+      ? "pages/auth/onboarding.html" : "pages/app/index.html";
     window.location.replace(destination);
     return true;
   }

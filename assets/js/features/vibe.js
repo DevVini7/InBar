@@ -145,7 +145,7 @@
     const recommendations = ranked.slice(0, 3).map(item => item.entity);
     list.innerHTML = recommendations.map(place => `
       <button type="button" class="home-recommendation-item" data-open-place="${place.id}">
-        <svg class="icon" aria-hidden="true"><use href="assets/icons.svg#${escapeHtml(place.icon || "map-pin")}"></use></svg>
+        <svg class="icon" aria-hidden="true"><use href="assets/icons/inbar.svg#${escapeHtml(place.icon || "map-pin")}"></use></svg>
         <span><strong>${escapeHtml(place.name)}</strong><small>${escapeHtml(place.category)} · ${escapeHtml(place.distance)}</small></span>
       </button>`).join("");
     empty.hidden = recommendations.length > 0;
