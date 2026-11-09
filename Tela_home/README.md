@@ -21,6 +21,9 @@ Projeto front-end em HTML, CSS e JavaScript. O mapa usa Leaflet e tiles cartogr�
 - `css/place-card.css`: cartão compacto e expandido dos locais.
 - `css/map-controls.css`: legenda, controles do mapa, notificações e marcadores.
 - `css/profile-menu.css`: menu de perfil da HOME.
+- `js/profile-appearance.js` e `css/profile-menu.css`: editor de aparência do perfil, com cores, molduras e foto de avatar salvas na conta local.
+- `js/profile.js` e `css/profile.css`: perfil com abas, edição de apelido/biografia/avatar, interesses, publicações próprias e dados privados da conta.
+- `js/vibe.js` e `css/vibe.css`: escolha da vibe da sessão e priorização de lugares usando a vibe e os interesses permanentes.
 - `css/responsive.css`: ajustes para tablets e celulares.
 - `css/missions.css`: estilos isolados da tela de Missões.
 - `js/missions.js`: filtros, busca, detalhes e progresso demonstrativo das missões.
@@ -44,11 +47,15 @@ Abra `index.html` na raiz do projeto para iniciar no login. Após enviar credenc
 - Filtros por bares, boates, música ao vivo, eventos, happy hour e hobbies; a busca sugere lugares e aceita nomes, regiões e termos relacionados, sem diferenciar acentos.
 - Marcadores com ícones SVG Lucide distintos para bares, boates, música ao vivo, eventos, boliche e karaokê; o mapa enquadra os pontos cadastrados e ancora cada pin na coordenada do local.
 - Menu visual de perfil com acesso à edição de preferências; as demais opções continuam demonstrativas.
+- Aparência personalizável por conta no menu de perfil: combinações de cores, cores individuais, molduras e foto quadrada comprimida; a prévia é isolada ao perfil, salva junto ao usuário neste navegador e pode ser restaurada ao padrão.
+- Perfil próprio com apelido público, nome completo, e-mail privado, biografia, interesses, publicações salvas e estado explícito das missões indisponíveis; edição de perfil e avatar pronto/foto ficam vinculados à conta local.
+- Vibe da sessão perguntada após login, em cards com seleção múltipla ou opção de pular. A escolha usa `sessionStorage`, é apagada ao sair e não altera as preferências permanentes do onboarding.
 - Onboarding de interesses no primeiro acesso, com edição pelo menu de perfil e armazenamento versionado em `localStorage`. As preferências ficam separadas pelo identificador do perfil autenticado no protótipo; o modo anônimo permanece apenas como fallback para páginas sem sessão.
 - A autenticação de demonstração fica em `login.html`, com estilos em `css/login.css`, lógica de formulário em `js/login.js` e sessão/perfis em `js/auth.js`. Qualquer e-mail válido e senha não vazia são aceitos para teste. Os perfis registrados e as preferências são separados por usuário; a sessão é removida ao sair. Não há servidor nem verificação segura de credenciais, e senhas não são armazenadas.
-- Metadados de recomendação nos locais existentes no formato `interests: { categoryIds, tags }`. `InbarInterests.getCompatibilityScore()` retorna uma pontuação de 0 a 100; `rankEntities()` retorna pares `{ entity, score }` para preparar recomendações no Feed e em Explorar, sem reordenar nem filtrar os marcadores do mapa. Categorias têm peso 1 e tags específicas peso 2.
+- Metadados de recomendação nos locais existentes no formato `interests: { categoryIds, tags }`. `InbarInterests.getCompatibilityScore()` retorna uma pontuação de 0 a 100; `rankEntities()` combina interesses permanentes com a vibe da sessão (70% vibe, 30% interesses quando ambos existem), priorizando lugares reais do catálogo em Explorar e nas sugestões da HOME/Feed, sem reordenar nem filtrar os marcadores do mapa. Categorias têm peso 1 e tags específicas peso 2.
 - Tela de Missões integrada à navegação: use "Missões" no cabeçalho; retorne pelo botão "Mapa", pela marca ou pelo histórico do navegador. A busca global filtra missões enquanto essa tela está aberta.
 - Feed integrado à navegação compartilhada: use "Feed", filtre por categoria ou autor, curta, comente, compartilhe ou crie publicações associadas a um local do catálogo. No protótipo, publicações e interações são armazenadas no `localStorage` deste navegador e associadas à sessão de teste; ainda não há sincronização por servidor. O conteúdo de exemplo fornecido na pasta `feed/` é identificado na tela e não representa atividade real.
+- Apelidos são únicos no protótipo local e usados como nome público. Contas antigas com `username` continuam compatíveis. O Feed permite excluir somente posts do autor da sessão, com confirmação; exclusões e interações continuam restritas ao armazenamento local.
 - Explorar integrado à navegação: os cartões são gerados a partir dos locais do mapa e permitem abrir os detalhes do estabelecimento no mapa.
 - Geolocalização do navegador (requer permissão; em geral funciona em localhost ou HTTPS) posicionada sobre o mapa real.
 - Layout adaptável para desktop e celular.
@@ -66,5 +73,6 @@ Abra `index.html` na raiz do projeto para iniciar no login. Após enviar credenc
 
 ## Observações
 - Os bares, boates, atividades, eventos, avaliações, ofertas, números de ocupação, fotos, perfis e publicações são dados fictícios de demonstração; nomes e regiões de alguns locais foram informados pelo usuário ou conferidos em listagens públicas. As coordenadas continuam aproximadas e não representam endereços exatos nem movimento real. Trem Bão está indicado em Lago Norte; os pontos da orla ficam em terra, perto do Lago Paranoá, nunca sobre a água.
+- A autenticação, os apelidos, o perfil, a vibe, as publicações e as interações são um protótipo local, sem serviço de backend. A validação de autoria no navegador não substitui autorização de servidor; contas locais não garantem apelidos únicos nem privacidade entre dispositivos/usuários do mesmo navegador.
 - Feed e Explorar usam o cabeçalho, perfil e navegação existentes; em telas pequenas, a própria navegação compartilhada fica acessível na base da tela quando uma dessas seções ou Missões está ativa.
 - Os dados cartográficos são do OpenStreetMap; a disponibilidade dos tiles depende do serviço e de suas políticas de uso. Consulte a atribuição exibida no mapa e [a política oficial de tiles](https://operations.osmfoundation.org/policies/tiles/).

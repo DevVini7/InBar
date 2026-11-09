@@ -184,6 +184,87 @@
   gap: 10px;
 }
 
+.feed-post-menu {
+  position: relative;
+  flex: 0 0 auto;
+  align-self: flex-start;
+}
+
+.feed-post-menu summary {
+  display: grid;
+  width: 30px;
+  height: 30px;
+  place-items: center;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  color: #9ba6bf;
+  list-style: none;
+  cursor: pointer;
+}
+
+.feed-post-menu summary::-webkit-details-marker {
+  display: none;
+}
+
+.feed-post-menu[open] summary,
+.feed-post-menu summary:hover {
+  border-color: rgba(143, 157, 190, .18);
+  background: #111629;
+  color: #e8d4f1;
+}
+
+.feed-post-menu summary .icon {
+  width: 17px;
+  height: 17px;
+}
+
+.feed-post-menu-popover {
+  position: absolute;
+  z-index: 15;
+  top: 34px;
+  right: 0;
+  width: 155px;
+  padding: 5px;
+  border: 1px solid rgba(143, 157, 190, .2);
+  border-radius: 9px;
+  background: #0c1020;
+  box-shadow: 0 10px 24px #0008;
+}
+
+.feed-post-menu-popover button {
+  width: 100%;
+  min-height: 34px;
+  padding: 0 8px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: #ff9aab;
+  text-align: left;
+  font-size: 10px;
+  cursor: pointer;
+}
+
+.feed-post-menu-popover button:hover {
+  background: rgba(255, 115, 141, .1);
+}
+
+.feed-confirm-dialog h2 {
+  margin: 0;
+  color: #f4f5fb;
+  font-size: 17px;
+}
+
+.feed-confirm-dialog p {
+  color: #aab4ca;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.feed-delete-confirm {
+  border-color: rgba(255, 115, 141, .42);
+  background: #81283e;
+}
+
 .feed-avatar {
   display: grid;
   width: 40px;
@@ -854,37 +935,43 @@
 
 @media (min-width: 761px) and (max-width: 900px) {
   body:has(#feedView:not(.hidden)) .topbar,
-  body:has(#exploreView:not(.hidden)) .topbar {
+  body:has(#exploreView:not(.hidden)) .topbar,
+  body:has(#profileView:not(.hidden)) .topbar {
     gap: 10px;
     padding-right: 14px;
     padding-left: 14px;
   }
 
   body:has(#feedView:not(.hidden)) .brand,
-  body:has(#exploreView:not(.hidden)) .brand {
+  body:has(#exploreView:not(.hidden)) .brand,
+  body:has(#profileView:not(.hidden)) .brand {
     min-width: 0;
   }
 
   body:has(#feedView:not(.hidden)) .main-nav,
-  body:has(#exploreView:not(.hidden)) .main-nav {
+  body:has(#exploreView:not(.hidden)) .main-nav,
+  body:has(#profileView:not(.hidden)) .main-nav {
     flex-shrink: 0;
     gap: 6px;
   }
 
   body:has(#feedView:not(.hidden)) .nav-link,
-  body:has(#exploreView:not(.hidden)) .nav-link {
+  body:has(#exploreView:not(.hidden)) .nav-link,
+  body:has(#profileView:not(.hidden)) .nav-link {
     min-width: 50px;
     font-size: 13px;
   }
 
   body:has(#feedView:not(.hidden)) .search,
-  body:has(#exploreView:not(.hidden)) .search {
+  body:has(#exploreView:not(.hidden)) .search,
+  body:has(#profileView:not(.hidden)) .search {
     min-width: 0;
     flex: 1;
   }
 
   body:has(#feedView:not(.hidden)) .profile-trigger-name,
-  body:has(#exploreView:not(.hidden)) .profile-trigger-name {
+  body:has(#exploreView:not(.hidden)) .profile-trigger-name,
+  body:has(#profileView:not(.hidden)) .profile-trigger-name {
     display: none;
   }
 }
@@ -960,7 +1047,8 @@
 
   body:has(#feedView:not(.hidden)) .main-nav,
   body:has(#exploreView:not(.hidden)) .main-nav,
-  body:has(#missionsView:not(.hidden)) .main-nav {
+  body:has(#missionsView:not(.hidden)) .main-nav,
+  body:has(#profileView:not(.hidden)) .main-nav {
     position: fixed;
     z-index: 1100;
     right: 0;
@@ -979,7 +1067,8 @@
 
   body:has(#feedView:not(.hidden)) .main-nav .nav-link,
   body:has(#exploreView:not(.hidden)) .main-nav .nav-link,
-  body:has(#missionsView:not(.hidden)) .main-nav .nav-link {
+  body:has(#missionsView:not(.hidden)) .main-nav .nav-link,
+  body:has(#profileView:not(.hidden)) .main-nav .nav-link {
     min-width: 0;
     flex: 1;
     justify-content: center;
@@ -988,14 +1077,16 @@
 
   body:has(#feedView:not(.hidden)) .main-nav .nav-link::after,
   body:has(#exploreView:not(.hidden)) .main-nav .nav-link::after,
-  body:has(#missionsView:not(.hidden)) .main-nav .nav-link::after {
+  body:has(#missionsView:not(.hidden)) .main-nav .nav-link::after,
+  body:has(#profileView:not(.hidden)) .main-nav .nav-link::after {
     right: 16%;
     left: 16%;
   }
 
   body:has(#feedView:not(.hidden)) #feedView,
   body:has(#exploreView:not(.hidden)) #exploreView,
-  body:has(#missionsView:not(.hidden)) #missionsView {
+  body:has(#missionsView:not(.hidden)) #missionsView,
+  body:has(#profileView:not(.hidden)) #profileView {
     bottom: 59px;
     padding-bottom: 26px;
   }

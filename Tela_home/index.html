@@ -31,6 +31,8 @@
   <link rel="stylesheet" href="css/responsive.css">
   <link rel="stylesheet" href="css/missions.css">
   <link rel="stylesheet" href="css/feed.css">
+  <link rel="stylesheet" href="css/profile.css">
+  <link rel="stylesheet" href="css/vibe.css">
 </head>
 
 <body>
@@ -68,7 +70,7 @@
     </form>
     <div class="profile-menu-wrap">
       <button class="profile-trigger" id="profileButton" aria-label="Abrir menu do perfil" aria-haspopup="menu" aria-expanded="false" aria-controls="profileMenu">
-        <span class="avatar-button" aria-hidden="true">
+        <span class="avatar-button profile-avatar profile-trigger-avatar" aria-hidden="true">
           <svg class="icon" aria-hidden="true">
             <use href="assets/icons.svg#user-round"></use>
           </svg>
@@ -77,7 +79,7 @@
       </button>
       <div class="profile-menu hidden" id="profileMenu" role="menu" aria-label="Menu do perfil">
         <div class="profile-menu-identity">
-          <span class="profile-menu-avatar" aria-hidden="true">
+          <span class="profile-menu-avatar profile-avatar" aria-hidden="true">
             <svg class="icon"><use href="assets/icons.svg#user-round"></use></svg>
           </span>
           <span class="profile-menu-user-details">
@@ -93,7 +95,15 @@
         </button>
         <button type="button" role="menuitem" id="editPreferences">
           <svg class="icon" aria-hidden="true"><use href="assets/icons.svg#settings-2"></use></svg>
-          Personalização
+          Meus interesses
+        </button>
+        <button type="button" role="menuitem" id="openProfile">
+          <svg class="icon" aria-hidden="true"><use href="assets/icons.svg#user-round"></use></svg>
+          Meu perfil
+        </button>
+        <button type="button" role="menuitem" id="editProfileAppearance">
+          <svg class="icon" aria-hidden="true"><use href="assets/icons.svg#settings-2"></use></svg>
+          Aparência do perfil
         </button>
         <div class="profile-menu-divider"></div>
         <button type="button" role="menuitem" class="profile-sign-out" id="signOutButton">Sair</button>
@@ -101,7 +111,202 @@
     </div>
   </header>
 
+  <dialog class="profile-appearance-dialog" id="profileAppearanceDialog" aria-labelledby="profileAppearanceTitle">
+    <form class="profile-appearance-form" id="profileAppearanceForm">
+      <header class="profile-appearance-heading">
+        <div>
+          <p class="profile-appearance-kicker">SEU ESPAÇO NO INBAR</p>
+          <h2 id="profileAppearanceTitle">Aparência do perfil</h2>
+          <p>Personalize seu avatar e seus detalhes sem mudar o restante do InBar.</p>
+        </div>
+        <button class="profile-appearance-close" type="button" id="closeProfileAppearance" aria-label="Fechar personalização">
+          <svg class="icon" aria-hidden="true"><use href="assets/icons.svg#x"></use></svg>
+        </button>
+      </header>
+
+      <section class="profile-appearance-preview" id="profileAppearancePreview" aria-label="Pré-visualização do perfil">
+        <span class="profile-appearance-preview-avatar profile-avatar" id="profileAppearancePreviewAvatar" aria-hidden="true">
+          <svg class="icon"><use href="assets/icons.svg#user-round"></use></svg>
+        </span>
+        <span class="profile-appearance-preview-copy">
+          <strong id="profileAppearancePreviewName">Usuário</strong>
+          <small>Seu perfil InBar</small>
+        </span>
+        <span class="profile-appearance-preview-mark" aria-hidden="true">InBar</span>
+      </section>
+
+      <fieldset class="profile-appearance-section">
+        <legend>Combinações de cores</legend>
+        <div class="profile-theme-options" id="profileThemeOptions" role="group" aria-label="Temas de perfil">
+          <button type="button" class="profile-theme-option" data-accent="#b20cff" data-secondary="#f04dff" aria-pressed="true">
+            <span class="profile-theme-swatches"><i></i><i></i></span>
+            InBar Original
+          </button>
+          <button type="button" class="profile-theme-option" data-accent="#a020f0" data-secondary="#e83eff" aria-pressed="false">
+            <span class="profile-theme-swatches"><i></i><i></i></span>
+            Roxo Neon
+          </button>
+          <button type="button" class="profile-theme-option" data-accent="#2759d8" data-secondary="#44bced" aria-pressed="false">
+            <span class="profile-theme-swatches"><i></i><i></i></span>
+            Azul Noturno
+          </button>
+          <button type="button" class="profile-theme-option" data-accent="#c21e4a" data-secondary="#ff665a" aria-pressed="false">
+            <span class="profile-theme-swatches"><i></i><i></i></span>
+            Vermelho Alternativo
+          </button>
+          <button type="button" class="profile-theme-option" data-accent="#16a879" data-secondary="#70dca8" aria-pressed="false">
+            <span class="profile-theme-swatches"><i></i><i></i></span>
+            Verde Neon
+          </button>
+          <button type="button" class="profile-theme-option" data-accent="#667085" data-secondary="#d1d5db" aria-pressed="false">
+            <span class="profile-theme-swatches"><i></i><i></i></span>
+            Minimalista
+          </button>
+        </div>
+        <div class="profile-color-fields">
+          <label>
+            <span>Cor de destaque</span>
+            <input id="profileAccentColor" type="color" value="#b20cff">
+          </label>
+          <label>
+            <span>Cor complementar</span>
+            <input id="profileSecondaryColor" type="color" value="#f04dff">
+          </label>
+        </div>
+      </fieldset>
+
+      <fieldset class="profile-appearance-section">
+        <legend>Avatar e moldura</legend>
+        <label class="profile-avatar-upload">
+          <span>
+            <strong>Foto de perfil</strong>
+            <small>Escolha uma imagem JPG, PNG ou WebP de até 5 MB.</small>
+          </span>
+          <input id="profileAvatarInput" type="file" accept="image/jpeg,image/png,image/webp">
+        </label>
+        <label class="profile-frame-field" for="profileAvatarFrame">
+          <span>Estilo da moldura</span>
+          <select id="profileAvatarFrame">
+            <option value="none">Clássica</option>
+            <option value="soft">Contorno suave</option>
+            <option value="double">Contorno duplo</option>
+          </select>
+        </label>
+      </fieldset>
+
+      <p class="profile-appearance-status" id="profileAppearanceStatus" role="status" aria-live="polite"></p>
+      <div class="profile-appearance-actions">
+        <button class="profile-appearance-reset" type="button" id="resetProfileAppearance">Restaurar padrão</button>
+        <div>
+          <button class="profile-appearance-cancel" type="button" id="cancelProfileAppearance">Cancelar</button>
+          <button class="profile-appearance-save" type="submit">Salvar aparência</button>
+        </div>
+      </div>
+    </form>
+  </dialog>
+
   <main class="explore-view hidden" id="exploreView" aria-label="Explorar"></main>
+
+  <main class="profile-view hidden" id="profileView" aria-label="Perfil">
+    <div class="profile-layout">
+      <header class="profile-hero" id="profileHero">
+        <div class="profile-hero-top">
+          <div class="profile-identity">
+            <span class="profile-page-avatar profile-avatar" id="profilePageAvatar" aria-hidden="true">
+              <svg class="icon"><use href="assets/icons.svg#user-round"></use></svg>
+            </span>
+            <div class="profile-identity-copy">
+              <p class="profile-kicker">SEU ESPAÇO NO INBAR</p>
+              <h1 id="profileNickname">@apelido</h1>
+              <p id="profileFullNameView"></p>
+            </div>
+          </div>
+          <button type="button" class="profile-edit-button" id="editProfile">
+            <svg class="icon" aria-hidden="true"><use href="assets/icons.svg#settings-2"></use></svg>
+            Editar perfil
+          </button>
+        </div>
+        <p class="profile-bio" id="profileBio"></p>
+        <div class="profile-private-row"><span>E-mail (visível somente para você)</span><strong id="profilePrivateEmail"></strong></div>
+        <div class="profile-stats">
+          <div><strong id="profilePostCount">0</strong><span>Publicações</span></div>
+          <div><strong id="profileInterestCount">0</strong><span>Interesses</span></div>
+          <div><strong id="profileJoinedDate">—</strong><span>No InBar desde</span></div>
+        </div>
+      </header>
+
+      <nav class="profile-tabs" role="tablist" aria-label="Seções do perfil">
+        <button type="button" role="tab" data-profile-tab="overview" aria-selected="true">Visão geral</button>
+        <button type="button" role="tab" data-profile-tab="posts" aria-selected="false">Publicações</button>
+        <button type="button" role="tab" data-profile-tab="interests" aria-selected="false">Interesses</button>
+        <button type="button" role="tab" data-profile-tab="missions" aria-selected="false">Missões</button>
+        <button type="button" role="tab" data-profile-tab="customize" aria-selected="false">Personalizar</button>
+      </nav>
+
+      <section class="profile-panel" role="tabpanel" data-profile-panel="overview">
+        <div class="profile-panel-heading"><div><p class="profile-kicker">SUA JORNADA</p><h2>Sobre você</h2></div></div>
+        <div class="profile-overview-grid">
+          <article class="profile-info-card">
+            <h3>Interesses</h3>
+            <div class="profile-interest-chips" id="profileOverviewInterests"></div>
+            <p class="profile-panel-note" id="profileNoInterests" hidden>Adicione interesses para encontrar experiências que combinam com você.</p>
+          </article>
+          <article class="profile-info-card">
+            <h3>Atividade</h3>
+            <p id="profileActivitySummary">Suas publicações aparecerão aqui.</p>
+            <button type="button" class="profile-inline-button" data-profile-tab-link="posts">Ver publicações</button>
+          </article>
+        </div>
+      </section>
+
+      <section class="profile-panel" role="tabpanel" data-profile-panel="posts" hidden>
+        <div class="profile-panel-heading"><div><p class="profile-kicker">SUA COMUNIDADE</p><h2>Suas publicações</h2></div><span id="profilePostsCountLabel"></span></div>
+        <div class="profile-post-list" id="profilePosts"></div>
+        <p class="profile-panel-note" id="profilePostsEmpty" hidden>Você ainda não publicou. Compartilhe uma experiência no Feed.</p>
+        <button type="button" class="profile-inline-button" id="openFeedFromProfile">Abrir Feed</button>
+      </section>
+
+      <section class="profile-panel" role="tabpanel" data-profile-panel="interests" hidden>
+        <div class="profile-panel-heading"><div><p class="profile-kicker">SUAS PREFERÊNCIAS</p><h2>Interesses e hobbies</h2><p>Escolhidos no onboarding; são diferentes da vibe do dia.</p></div><button type="button" class="profile-inline-button" id="editProfileInterests">Editar interesses</button></div>
+        <div class="profile-interest-groups" id="profileInterestGroups"></div>
+        <p class="profile-panel-note" id="profileInterestsEmpty" hidden>Você ainda não selecionou interesses permanentes.</p>
+      </section>
+
+      <section class="profile-panel" role="tabpanel" data-profile-panel="missions" hidden>
+        <div class="profile-panel-heading"><div><p class="profile-kicker">EVOLUÇÃO INBAR</p><h2>Missões</h2></div><button type="button" class="profile-inline-button" id="openMissionsFromProfile">Ver desafios</button></div>
+        <div class="profile-unavailable-state">
+          <span aria-hidden="true">✦</span>
+          <h3>Progresso ainda não conectado</h3>
+          <p>As missões exibidas no InBar são prévias. Não existe registro real de conclusão ou XP neste protótipo.</p>
+        </div>
+      </section>
+
+      <section class="profile-panel" role="tabpanel" data-profile-panel="customize" hidden>
+        <div class="profile-panel-heading"><div><p class="profile-kicker">SUA IDENTIDADE</p><h2>Personalizar perfil</h2><p>As cores e o avatar afetam somente seu perfil.</p></div></div>
+        <div class="profile-customize-card">
+          <span class="profile-customize-mark">InBar</span>
+          <div><strong>Deixe seu perfil com a sua cara</strong><p>Escolha cores, moldura e foto com pré-visualização antes de salvar.</p></div>
+          <button type="button" class="profile-edit-button" id="openProfileAppearance">Personalizar perfil</button>
+        </div>
+      </section>
+    </div>
+
+    <dialog class="profile-edit-dialog" id="profileEditDialog" aria-labelledby="profileEditTitle">
+      <form class="profile-edit-form" id="profileEditForm">
+        <header class="profile-edit-heading"><div><p class="profile-kicker">SUA CONTA</p><h2 id="profileEditTitle">Editar perfil</h2></div><button type="button" id="closeProfileEdit" aria-label="Fechar">×</button></header>
+        <label>Apelido<input id="editNickname" name="nickname" minlength="3" maxlength="24" required></label>
+        <label>Nome completo<input id="editFullName" name="fullName" maxlength="100"></label>
+        <label>Biografia<textarea id="editBio" name="bio" maxlength="240" rows="3" placeholder="Conte um pouco sobre você"></textarea></label>
+        <label>Avatar pronto<select id="editAvatarPreset">
+          <option value="user-round">Padrão InBar</option><option value="beer">🍻 Bares</option><option value="music-2">🎶 Música</option><option value="images">🎨 Arte</option><option value="map-pin">📍 Exploração</option><option value="gamepad-2">🎮 Jogos</option>
+        </select></label>
+        <label>Ou envie uma foto (até 5 MB)<input id="editProfilePhoto" type="file" accept="image/jpeg,image/png,image/webp"></label>
+        <div class="profile-edit-preview"><span class="profile-page-avatar profile-avatar" id="profileEditAvatarPreview" aria-hidden="true"></span><button type="button" id="removeProfilePhoto">Remover foto e usar avatar</button></div>
+        <p class="profile-edit-status" id="profileEditStatus" role="status" aria-live="polite"></p>
+        <div class="profile-edit-actions"><button type="button" id="cancelProfileEdit">Cancelar</button><button type="submit">Salvar alterações</button></div>
+      </form>
+    </dialog>
+  </main>
 
   <main class="feed-view hidden" id="feedView" aria-label="Feed">
     <div class="feed-layout">
@@ -209,8 +414,40 @@
       </section>
     </dialog>
 
+    <dialog class="feed-dialog feed-confirm-dialog" id="deletePostDialog" aria-labelledby="deletePostTitle">
+      <form method="dialog" class="feed-dialog-form">
+        <h2 id="deletePostTitle">Excluir publicação?</h2>
+        <p>Esta ação removerá a publicação deste navegador e do seu perfil.</p>
+        <div class="feed-dialog-actions">
+          <button type="submit" class="feed-secondary-button" value="cancel">Cancelar</button>
+          <button type="button" class="feed-primary-button feed-delete-confirm" data-feed-action="confirm-delete">Excluir publicação</button>
+        </div>
+      </form>
+    </dialog>
+
     <div class="feed-toast" id="feedToast" role="status" aria-live="polite"></div>
   </main>
+
+  <dialog class="vibe-dialog" id="vibeDialog" aria-labelledby="vibeTitle">
+    <form class="vibe-form" id="vibeForm">
+      <p class="vibe-kicker">SEU MOMENTO, SUAS ESCOLHAS</p>
+      <h2 id="vibeTitle">Qual é a sua vibe de hoje?</h2>
+      <p class="vibe-description">Conta pra gente o que você está procurando hoje. Vamos encontrar experiências que combinam com seu momento!</p>
+      <div class="vibe-options" id="vibeOptions" role="group" aria-label="Escolha uma ou mais vibes">
+        <button type="button" class="vibe-option" data-vibe="bares" aria-pressed="false"><span>🍻</span><strong>Bares e resenha</strong><small>Conhecer bares e tomar alguma coisa</small></button>
+        <button type="button" class="vibe-option" data-vibe="musica" aria-pressed="false"><span>🎶</span><strong>Música e shows</strong><small>Música ao vivo e shows</small></button>
+        <button type="button" class="vibe-option" data-vibe="festas" aria-pressed="false"><span>🎉</span><strong>Festa e balada</strong><small>Dançar e aproveitar a noite</small></button>
+        <button type="button" class="vibe-option" data-vibe="ar-livre" aria-pressed="false"><span>🌿</span><strong>Ar livre</strong><small>Passeios e atividades externas</small></button>
+        <button type="button" class="vibe-option" data-vibe="jogos" aria-pressed="false"><span>🎮</span><strong>Jogos e diversão</strong><small>Jogos e experiências diferentes</small></button>
+        <button type="button" class="vibe-option" data-vibe="esportes" aria-pressed="false"><span>🏃</span><strong>Esportes e atividades</strong><small>Atividades físicas e movimento</small></button>
+        <button type="button" class="vibe-option" data-vibe="cultura" aria-pressed="false"><span>🎨</span><strong>Arte e cultura</strong><small>Cinema, teatro e exposições</small></button>
+        <button type="button" class="vibe-option" data-vibe="social" aria-pressed="false"><span>🤝</span><strong>Socializar</strong><small>Conhecer pessoas e amizades</small></button>
+        <button type="button" class="vibe-option" data-vibe="surpresa" aria-pressed="false"><span>✨</span><strong>Surpreenda-me</strong><small>Descobrir algo diferente</small></button>
+      </div>
+      <p class="vibe-status" id="vibeStatus" role="status" aria-live="polite"></p>
+      <footer class="vibe-actions"><button type="button" id="skipVibe">Agora não</button><button type="submit">Encontrar minha vibe</button></footer>
+    </form>
+  </dialog>
 
   <main class="missions-view hidden" id="missionsView" aria-label="Missões">
     <div class="missions-layout">
@@ -418,6 +655,12 @@
         <span class="filter-label">Hobbies</span>
       </button>
     </aside>
+    <aside class="home-recommendations hidden" id="homeRecommendations" aria-label="Recomendações para sua vibe">
+      <p class="profile-kicker" id="homeRecommendationsKicker">PARA SEU MOMENTO</p>
+      <h2 id="homeRecommendationsTitle">Sugestões para você</h2>
+      <div id="homeRecommendationsList"></div>
+      <p class="home-recommendations-empty" id="homeRecommendationsEmpty" hidden>Não há lugares cadastrados que combinem com essa seleção ainda.</p>
+    </aside>
 
     <section class="place-card hidden" id="placeCard" aria-live="polite">
       <button class="card-arrow" id="nextPlace" aria-label="Próximo lugar">
@@ -557,8 +800,11 @@
   <script src="js/map.js"></script>
   <script src="js/place-card.js"></script>
   <script src="js/app.js"></script>
+  <script src="js/profile-appearance.js"></script>
   <script src="js/missions.js"></script>
   <script src="../feed/Inbar/data.js"></script>
   <script src="js/feed.js"></script>
+  <script src="js/profile.js"></script>
+  <script src="js/vibe.js"></script>
 </body>
 </html>

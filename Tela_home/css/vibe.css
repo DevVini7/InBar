@@ -1,0 +1,164 @@
+.vibe-dialog {
+  width: min(760px, calc(100vw - 28px));
+  max-height: min(92vh, 840px);
+  padding: 0;
+  overflow: auto;
+  border: 1px solid rgba(143, 157, 190, .22);
+  border-radius: 19px;
+  background: #0b0e1b;
+  color: #f4f5fb;
+  box-shadow: 0 26px 90px rgba(0, 0, 0, .6);
+  transition: opacity .2s ease, transform .2s ease;
+}
+
+.vibe-dialog::backdrop {
+  background: rgba(2, 4, 12, .82);
+  backdrop-filter: blur(6px);
+}
+
+.vibe-dialog[open] {
+  animation: vibe-enter .24s ease both;
+}
+
+.vibe-dialog.is-confirming {
+  opacity: .8;
+  transform: scale(.985);
+}
+
+@keyframes vibe-enter {
+  from { opacity: 0; transform: translateY(9px) scale(.99); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.vibe-form {
+  padding: clamp(18px, 4vw, 28px);
+}
+
+.vibe-kicker {
+  margin: 0 0 7px;
+  color: #d65bff;
+  font-size: 9px;
+  font-weight: 750;
+  letter-spacing: .15em;
+}
+
+.vibe-form h2 {
+  margin: 0;
+  font-size: clamp(21px, 4vw, 28px);
+  letter-spacing: -.04em;
+}
+
+.vibe-description {
+  max-width: 620px;
+  margin: 8px 0 17px;
+  color: #aab4ca;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.vibe-options {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.vibe-option {
+  display: grid;
+  min-height: 100px;
+  align-content: start;
+  gap: 5px;
+  padding: 11px;
+  border: 1px solid rgba(143, 157, 190, .15);
+  border-radius: 11px;
+  background: #101424;
+  color: #e7eaf4;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color .16s ease, background .16s ease, transform .16s ease;
+}
+
+.vibe-option:hover {
+  transform: translateY(-1px);
+  border-color: rgba(191, 77, 228, .4);
+}
+
+.vibe-option[aria-pressed="true"] {
+  border-color: #bd43ec;
+  background: linear-gradient(145deg, rgba(111, 34, 144, .24), #101424 85%);
+  box-shadow: inset 0 0 0 1px rgba(191, 77, 228, .14);
+}
+
+.vibe-option > span {
+  font-size: 18px;
+}
+
+.vibe-option strong {
+  font-size: 10px;
+}
+
+.vibe-option small {
+  color: #99a4bb;
+  font-size: 9px;
+  line-height: 1.4;
+}
+
+.vibe-status {
+  min-height: 16px;
+  margin: 9px 0 0;
+  color: #ff9aab;
+  font-size: 10px;
+}
+
+.vibe-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 9px;
+  margin-top: 9px;
+}
+
+.vibe-actions button {
+  min-height: 38px;
+  padding: 0 14px;
+  border: 1px solid rgba(143, 157, 190, .21);
+  border-radius: 9px;
+  background: transparent;
+  color: #b7c0d5;
+  font-size: 10px;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.vibe-actions button[type="submit"] {
+  border-color: #b646dc;
+  background: linear-gradient(110deg, #8c12d9, #bd24b9);
+  color: white;
+}
+
+@media (max-width: 580px) {
+  .vibe-options {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .vibe-option {
+    min-height: 88px;
+    padding: 9px;
+  }
+}
+
+@media (max-width: 350px) {
+  .vibe-option strong {
+    font-size: 9px;
+  }
+
+  .vibe-option small {
+    font-size: 8px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vibe-dialog *,
+  .vibe-option {
+    animation-duration: .01ms !important;
+    transition-duration: .01ms !important;
+  }
+}

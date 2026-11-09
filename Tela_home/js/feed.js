@@ -13,6 +13,7 @@
   const placeSelect = document.getElementById("postPlace");
   const publishDialog = document.getElementById("publishDialog");
   const commentsDialog = document.getElementById("commentsDialog");
+  const deletePostDialog = document.getElementById("deletePostDialog");
   const publishForm = document.getElementById("publishForm");
   const commentForm = document.getElementById("commentForm");
   const imageInput = document.getElementById("postImage");
@@ -24,6 +25,7 @@
     kind: "Todos",
     placeId: null,
     activePostId: null,
+    pendingDeletePostId: null,
     pendingImage: "",
     toastTimer: 0
   };
@@ -158,6 +160,7 @@
     }
     state.posts = posts;
     renderPosts();
+    window.dispatchEvent(new CustomEvent("inbar:feed-updated"));
     if (successMessage) showToast(successMessage);
     return true;
   }
@@ -195,7 +198,9 @@
         || (state.kind === "Pessoas" && post.type === "user")
         || (state.kind === "Estabelecimentos" && post.type === "establishment");
       const placeMatches = state.placeId === null || post.placeId === state.placeId;
-      const searchable = normalizeText(`${post.authorName} ${post.content} ${post.category} ${place?.name || ""} ${place?.distance || ""}`);
+      const currentUser = post.authorId === user.id ? window.InbarAuth.getCurrentUser() : null;
+      const authorName = currentUser?.displayName || currentUser?.nickname || post.authorName;
+      const searchable = normalizeText(`${authorName} ${post.authorName} ${post.content} ${post.category} ${place?.name || ""} ${place?.distance || ""}`);
       return categoryMatches && kindMatches && placeMatches && (!query || searchable.includes(query));
     });
   }
@@ -216,6 +221,8 @@
   function postCard(post) {
     const place = post.placeId === null ? null : placeById(post.placeId);
     const liked = post.likes.includes(user.id);
+    const ownsPost = post.authorId === user.id && !post.isExample;
+    const currentUser = window.InbarAuth.getCurrentUser();
     const likeCount = post.baseLikes + post.likes.length;
     const placeMarkup = place
       ? `<button type="button" class="feed-place-link" data-feed-action="open-place" data-place-id="${place.id}">
@@ -226,21 +233,31 @@
     const mediaMarkup = post.image
       ? `<div class="feed-post-media"><img src="${escapeHtml(post.image)}" alt="${escapeHtml(place ? `Experiência em ${place.name}` : "Imagem da publicação")}" loading="lazy"></div>`
       : "";
-    const avatarMarkup = post.isExample && post.avatar
+    const avatarMarkup = ownsPost && currentUser?.profileAppearance?.avatar
+      ? `<img class="feed-avatar" src="${escapeHtml(currentUser.profileAppearance.avatar)}" alt="" loading="lazy">`
+      : post.isExample && post.avatar
       ? `<img class="feed-avatar" src="${escapeHtml(post.avatar)}" alt="" loading="lazy">`
-      : `<span class="feed-avatar feed-avatar-placeholder" aria-hidden="true"><svg class="icon"><use href="assets/icons.svg#user-round"></use></svg></span>`;
+      : `<span class="feed-avatar feed-avatar-placeholder" aria-hidden="true"><svg class="icon"><use href="assets/icons.svg#${ownsPost ? currentUser?.profileAppearance?.avatarPreset || "user-round" : "user-round"}"></use></svg></span>`;
+    const authorName = ownsPost ? currentUser.displayName || currentUser.nickname || post.authorName : post.authorName;
+    const menuMarkup = ownsPost
+      ? `<details class="feed-post-menu">
+          <summary aria-label="Opções da publicação"><svg class="icon" aria-hidden="true"><use href="assets/icons.svg#ellipsis"></use></svg></summary>
+          <div class="feed-post-menu-popover"><button type="button" data-feed-action="delete" data-post-id="${escapeHtml(post.id)}">Excluir publicação</button></div>
+        </details>`
+      : "";
 
     return `<article class="feed-post" data-post-id="${escapeHtml(post.id)}">
       <header class="feed-post-header">
         ${avatarMarkup}
         <div class="feed-author-details">
-          <strong>${escapeHtml(post.authorName)}</strong>
+          <strong>${escapeHtml(authorName)}</strong>
           <span>${escapeHtml(formatPostDate(post))}</span>
         </div>
         <div class="feed-post-badges">
           <span class="feed-category">${escapeHtml(post.category)}</span>
           ${post.isExample ? '<span class="feed-example-badge">Exemplo</span>' : ""}
         </div>
+        ${menuMarkup}
       </header>
       <p class="feed-post-content">${escapeHtml(post.content)}</p>
       ${mediaMarkup}
@@ -263,7 +280,19 @@
   }
 
   function renderPlaces() {
-    const featuredPlaces = places.slice(0, 5);
+    const rankedPlaces = window.InbarRecommendations
+      ? window.InbarRecommendations.rankPlaces(places)
+      : places.map(entity => ({ entity, score: 0 }));
+    const vibe = window.InbarVibe && window.InbarVibe.getCurrent();
+    const featuredPlaces = rankedPlaces
+      .filter(item => !vibe || item.score > 0)
+      .slice(0, 5)
+      .map(item => item.entity);
+    if (!featuredPlaces.length) {
+      document.getElementById("feedPlaceList").innerHTML =
+        '<p class="feed-sidebar-note">Ainda não há lugares cadastrados que combinem com a vibe escolhida.</p>';
+      return;
+    }
     document.getElementById("feedPlaceList").innerHTML = featuredPlaces.map(place => `
       <article class="feed-place-item">
         <span class="feed-place-icon" aria-hidden="true"><svg class="icon"><use href="assets/icons.svg#${escapeHtml(place.icon || "map-pin")}"></use></svg></span>
@@ -279,10 +308,13 @@
   }
 
   function renderComments(post) {
+    const currentUser = window.InbarAuth.getCurrentUser();
     document.getElementById("feedCommentsList").innerHTML = post.comments.length
       ? post.comments.map(comment => `<article class="feed-comment">
-          <span class="feed-avatar feed-avatar-placeholder" aria-hidden="true"><svg class="icon"><use href="assets/icons.svg#user-round"></use></svg></span>
-          <div><strong>${escapeHtml(comment.authorName)}</strong><p>${escapeHtml(comment.content)}</p></div>
+          ${comment.authorId === currentUser.id && currentUser.profileAppearance?.avatar
+            ? `<img class="feed-avatar" src="${escapeHtml(currentUser.profileAppearance.avatar)}" alt="" loading="lazy">`
+            : `<span class="feed-avatar feed-avatar-placeholder" aria-hidden="true"><svg class="icon"><use href="assets/icons.svg#${comment.authorId === currentUser.id ? currentUser.profileAppearance?.avatarPreset || "user-round" : "user-round"}"></use></svg></span>`}
+          <div><strong>${escapeHtml(comment.authorId === currentUser.id ? currentUser.displayName || currentUser.nickname || comment.authorName : comment.authorName)}</strong><p>${escapeHtml(comment.content)}</p></div>
         </article>`).join("")
       : '<p class="feed-comments-empty">Ainda não há comentários. Comece a conversa.</p>';
   }
@@ -422,6 +454,28 @@
     if (action.dataset.feedAction === "open-place") window.InbarNavigation.openPlace(placeId);
     if (action.dataset.feedAction === "comments") openComments(postId);
     if (action.dataset.feedAction === "share") sharePost(postId);
+    if (action.dataset.feedAction === "delete") {
+      const post = state.posts.find(item => item.id === postId);
+      if (!post || post.authorId !== user.id || post.isExample) {
+        showToast("Você só pode excluir suas próprias publicações.");
+        return;
+      }
+      state.pendingDeletePostId = postId;
+      deletePostDialog.showModal();
+    }
+    if (action.dataset.feedAction === "confirm-delete") {
+      const post = state.posts.find(item => item.id === state.pendingDeletePostId);
+      if (!post || post.authorId !== window.InbarAuth.getCurrentUser()?.id || post.isExample) {
+        showToast("Você só pode excluir suas próprias publicações.");
+        closeDialog(deletePostDialog);
+        state.pendingDeletePostId = null;
+        return;
+      }
+      if (commitPosts(state.posts.filter(item => item.id !== post.id), "Publicação excluída.")) {
+        closeDialog(deletePostDialog);
+        state.pendingDeletePostId = null;
+      }
+    }
     if (action.dataset.feedAction === "like") {
       const post = state.posts.find(item => item.id === postId);
       if (!post) return;
@@ -476,7 +530,7 @@
       const newPost = {
         id: `post-${crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(16).slice(2)}`}`,
         authorId: user.id,
-        authorName: typeof user.fullName === "string" && user.fullName.trim() ? user.fullName.trim() : "Usuário",
+        authorName: window.InbarAuth.getCurrentUser().displayName || user.nickname || "Usuário",
         avatar: "",
         type: "user",
         content,
@@ -512,7 +566,7 @@
       const comment = {
         id: `comment-${crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(16).slice(2)}`}`,
         authorId: user.id,
-        authorName: typeof user.fullName === "string" && user.fullName.trim() ? user.fullName.trim() : "Usuário",
+        authorName: window.InbarAuth.getCurrentUser().displayName || user.nickname || "Usuário",
         content,
         createdAt: new Date().toISOString()
       };
@@ -522,7 +576,7 @@
         renderComments(updatedPost);
       }
     });
-    [publishDialog, commentsDialog].forEach(dialog => dialog.addEventListener("click", event => {
+    [publishDialog, commentsDialog, deletePostDialog].forEach(dialog => dialog.addEventListener("click", event => {
       if (event.target === dialog) closeDialog(dialog);
     }));
     window.addEventListener("storage", event => {
@@ -530,9 +584,22 @@
       try {
         state.posts = mergeExamplePosts(readStoredPosts());
         renderPosts();
+        window.dispatchEvent(new CustomEvent("inbar:feed-updated"));
       } catch (error) {
         console.error("Não foi possível atualizar o Feed após uma alteração em outra aba.", error);
         showToast("Os dados do Feed em outra aba estão inválidos. Recarregue para verificar.");
+      }
+    });
+    window.addEventListener("inbar:vibe-updated", renderPlaces);
+    window.addEventListener("inbar:preferences-updated", renderPlaces);
+    window.addEventListener("inbar:profile-updated", () => {
+      renderPosts();
+      if (commentsDialog.open) {
+        const post = state.posts.find(item => item.id === state.activePostId);
+        if (post) {
+          document.getElementById("commentsTitle").textContent = `Comentários · ${window.InbarAuth.getCurrentUser().displayName || post.authorName}`;
+          renderComments(post);
+        }
       }
     });
   }
@@ -560,6 +627,12 @@
       state.kind = "Todos";
       categoryFilters.querySelector('[data-feed-category="Todas"]').click();
       view.querySelector('[data-feed-kind="Todos"]').click();
+    },
+    getPostsByAuthor(authorId) {
+      return state.posts.filter(post => post.authorId === authorId && !post.isExample);
+    },
+    getOwnPosts() {
+      return this.getPostsByAuthor(window.InbarAuth.getCurrentUser()?.id || "");
     }
   };
 })();

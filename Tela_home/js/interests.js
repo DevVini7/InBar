@@ -241,8 +241,18 @@ window.InbarInterests = (() => {
   }
 
   function rankEntities(entities, preferences = loadPreferences()) {
+    const vibe = window.InbarVibe ? window.InbarVibe.getCurrent() : null;
+    const hasPermanentInterests = preferences.categoryIds.length > 0 || preferences.interestIds.length > 0;
+    const hasDailyVibe = Boolean(vibe && (vibe.categoryIds.length || vibe.interestIds.length));
     return entities
-      .map((entity, index) => ({ entity, score: getCompatibilityScore(entity, preferences), index }))
+      .map((entity, index) => {
+        const permanentScore = getCompatibilityScore(entity, preferences);
+        const dailyScore = hasDailyVibe ? getCompatibilityScore(entity, vibe) : permanentScore;
+        const score = hasDailyVibe && hasPermanentInterests
+          ? dailyScore * .7 + permanentScore * .3
+          : hasDailyVibe ? dailyScore : permanentScore;
+        return { entity, score, index };
+      })
       .sort((first, second) => second.score - first.score || first.index - second.index)
       .map(({ entity, score }) => ({ entity, score }));
   }

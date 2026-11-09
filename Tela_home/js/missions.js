@@ -100,10 +100,10 @@
   });
 
   const currentUser = window.InbarAuth && window.InbarAuth.getCurrentUser();
-  const fullName = currentUser && typeof currentUser.fullName === "string" && currentUser.fullName.trim()
-    ? currentUser.fullName.trim()
+  const displayName = currentUser
+    ? currentUser.displayName || currentUser.nickname || currentUser.username || currentUser.fullName || "Usuário"
     : "Usuário";
-  document.getElementById("missionsUserName").textContent = fullName;
+  document.getElementById("missionsUserName").textContent = displayName;
 
   filterMissions();
 })();

@@ -13,7 +13,7 @@
   const confirmPassword = document.getElementById("confirmPassword");
   const registrationFields = [
     ["fullName", "fullNameGroup"],
-    ["username", "usernameGroup"],
+    ["nickname", "nicknameGroup"],
     ["phone", "phoneGroup"],
     ["confirmPassword", "confirmPasswordGroup"],
     ["ageConfirmation", "ageGroup"],
@@ -24,9 +24,10 @@
       valueMissing: "Informe seu nome completo.",
       tooShort: "Digite seu nome completo."
     },
-    username: {
-      valueMissing: "Informe um nome de usuário.",
-      tooShort: "O nome de usuário deve ter pelo menos 3 caracteres."
+    nickname: {
+      valueMissing: "Informe seu apelido.",
+      tooShort: "O apelido deve ter pelo menos 3 caracteres.",
+      patternMismatch: "Use de 3 a 24 letras, números, pontos, hífens ou sublinhados."
     },
     phone: {
       valueMissing: "Informe seu telefone.",
@@ -84,7 +85,7 @@
     form.reset();
     clearErrors();
     document.getElementById("fullNameGroup").hidden = !registration;
-    document.getElementById("usernameGroup").hidden = !registration;
+    document.getElementById("nicknameGroup").hidden = !registration;
     document.getElementById("phoneGroup").hidden = !registration;
     document.getElementById("confirmPasswordGroup").hidden = !registration;
     document.getElementById("ageGroup").hidden = !registration;
@@ -140,6 +141,11 @@
 
     controls.forEach(input => {
       const error = validateField(input);
+      if (!error && input.name === "nickname" && !window.InbarAuth.validateNickname(input.value)) {
+        setFieldError(input.name, "Use de 3 a 24 letras, números, pontos, hífens ou sublinhados.");
+        invalidFields.push(input);
+        return;
+      }
       setFieldError(input.name, error);
       if (error) invalidFields.push(input);
     });
@@ -207,13 +213,19 @@
       try {
         window.InbarAuth.register({
           fullName: form.elements.namedItem("fullName").value,
+          nickname: form.elements.namedItem("nickname").value,
           email: form.elements.namedItem("email").value,
           ageConfirmed: form.elements.namedItem("ageConfirmation").checked
         });
         formStatus.dataset.state = "info";
-        formStatus.textContent = "usuario cadastrado com sucesso.";
+        formStatus.textContent = "Conta criada com sucesso. Entre para continuar.";
       } catch (error) {
         console.error("Não foi possível concluir o cadastro de teste do InBar.", error);
+        if (error.message && error.message.includes("apelido")) {
+          setFieldError("nickname", error.message);
+          form.elements.namedItem("nickname").focus();
+          return;
+        }
         formStatus.dataset.state = "error";
         formStatus.textContent = error.message || "Não foi possível concluir o cadastro.";
       }

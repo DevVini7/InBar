@@ -2,7 +2,7 @@ const places = window.inbarPlaces;
 let selectedId = null;
 let activeFilter = "Todos";
 let activePage = "Mapa";
-const searchValues = { Mapa: "", Explorar: "", Feed: "", Missões: "" };
+const searchValues = { Mapa: "", Explorar: "", Feed: "", Missões: "", Perfil: "" };
 let toastTimer;
 
 function showToast(message) {
@@ -192,10 +192,12 @@ function setActivePage(page, updateHistory = true) {
   const exploreVisible = page === "Explorar";
   const feedVisible = page === "Feed";
   const missionsVisible = page === "Missões";
+  const profileVisible = page === "Perfil";
   document.querySelector(".map-shell").classList.toggle("hidden", !mapVisible);
   document.getElementById("exploreView").classList.toggle("hidden", !exploreVisible);
   document.getElementById("feedView").classList.toggle("hidden", !feedVisible);
   document.getElementById("missionsView").classList.toggle("hidden", !missionsVisible);
+  document.getElementById("profileView").classList.toggle("hidden", !profileVisible);
   searchInput.placeholder = missionsVisible ? "Buscar missões..."
     : feedVisible ? "Buscar publicações e lugares..."
       : "Buscar lugares, bairros...";
@@ -207,13 +209,14 @@ function setActivePage(page, updateHistory = true) {
   document.querySelectorAll(".nav-link").forEach(link => {
     link.classList.toggle("active", link.dataset.page === page);
   });
+  if (profileVisible && window.InbarProfile) window.InbarProfile.refresh();
 
   if (mapVisible) {
     window.requestAnimationFrame(() => window.InbarMap.invalidateSize());
   }
 
   if (updateHistory) {
-    const route = { "Mapa": "", "Explorar": "#explorar", "Feed": "#feed", "Missões": "#missions" }[page];
+    const route = { "Mapa": "", "Explorar": "#explorar", "Feed": "#feed", "Missões": "#missions", "Perfil": "#perfil" }[page];
     window.history.pushState({ page }, "", route || "#");
   }
 }
@@ -225,13 +228,19 @@ function renderExplore() {
     const searchable = normalizeText(`${place.name} ${place.distance} ${place.desc} ${place.types.join(" ")} ${(place.searchTerms || []).join(" ")}`);
     return !query || searchable.includes(query);
   });
+  const ranked = window.InbarRecommendations
+    ? window.InbarRecommendations.rankPlaces(matches)
+    : matches.map(entity => ({ entity, score: 0 }));
+  const orderedMatches = ranked.map(item => item.entity);
+  const vibe = window.InbarVibe && window.InbarVibe.getCurrent();
+  const sortedByRelevance = ranked.some(item => item.score > 0);
   view.innerHTML = `<div class="explore-layout">
     <header class="explore-heading">
-      <div><p class="feed-kicker">ENCONTRE SEU PRÓXIMO ROLÊ</p><h1>Explorar</h1><p>Descubra os lugares cadastrados no InBar e veja seus detalhes no mapa.</p></div>
+      <div><p class="feed-kicker">ENCONTRE SEU PRÓXIMO ROLÊ</p><h1>Explorar</h1><p>${vibe ? `Prioridade para: ${escapeHtml(vibe.label)}. ` : ""}${sortedByRelevance ? "Sugestões priorizadas pelos seus interesses e pela vibe desta sessão." : "Descubra os lugares cadastrados no InBar e veja seus detalhes no mapa."}</p></div>
       <span class="explore-count">${matches.length} ${matches.length === 1 ? "lugar" : "lugares"}</span>
     </header>
     <section class="explore-grid" aria-label="Lugares cadastrados">
-      ${matches.map(place => `<article class="explore-card">
+      ${orderedMatches.map(place => `<article class="explore-card">
         <img src="${escapeHtml(place.image)}" alt="" loading="lazy">
         <div class="explore-card-body">
           <div class="explore-card-title"><h2>${escapeHtml(place.name)}</h2><span>${escapeHtml(place.category)}</span></div>
@@ -247,10 +256,11 @@ function renderExplore() {
 
 function routeFromHash() {
   const route = window.location.hash.replace(/^#\/?/, "").toLocaleLowerCase("pt-BR");
-  return route === "missions" || route === "feed" || route === "explorar" ? {
+  return route === "missions" || route === "feed" || route === "explorar" || route === "perfil" ? {
     missions: "Missões",
     feed: "Feed",
-    explorar: "Explorar"
+    explorar: "Explorar",
+    perfil: "Perfil"
   }[route] : "Mapa";
 }
 
@@ -261,15 +271,16 @@ function setupProfile() {
     return;
   }
 
-  const fullName = typeof currentUser.fullName === "string" && currentUser.fullName.trim()
-    ? currentUser.fullName.trim()
-    : "Usuário";
+  const fullName = currentUser.displayName || currentUser.nickname || currentUser.username
+    || (typeof currentUser.fullName === "string" && currentUser.fullName.trim() ? currentUser.fullName.trim() : "Usuário");
   const email = typeof currentUser.email === "string" ? currentUser.email : "";
   document.getElementById("profileTriggerName").textContent = fullName;
   document.getElementById("profileFullName").textContent = fullName;
   document.getElementById("profileEmail").textContent = email;
   document.getElementById("profileEmail").hidden = !email;
   document.getElementById("profileButton").setAttribute("aria-label", `Abrir perfil de ${fullName}`);
+  document.getElementById("profilePageAvatar").replaceChildren();
+  document.getElementById("profileNickname").textContent = `@${fullName}`;
 }
 
 function closeProfileMenu() {
@@ -329,6 +340,16 @@ function setupEvents() {
     const button = event.target.closest("[data-open-place]");
     if (button) window.InbarNavigation.openPlace(Number(button.dataset.openPlace));
   });
+  document.getElementById("homeRecommendationsList").addEventListener("click", event => {
+    const button = event.target.closest("[data-open-place]");
+    if (button) window.InbarNavigation.openPlace(Number(button.dataset.openPlace));
+  });
+  window.addEventListener("inbar:vibe-updated", () => {
+    if (activePage === "Explorar") renderExplore();
+  });
+  window.addEventListener("inbar:preferences-updated", () => {
+    if (activePage === "Explorar") renderExplore();
+  });
   document.querySelector(".brand").addEventListener("click", event => {
     if (activePage !== "Mapa") {
       event.preventDefault();
@@ -351,6 +372,10 @@ function setupEvents() {
   document.getElementById("editPreferences").addEventListener("click", () => {
     closeProfileMenu();
     window.location.assign("./onboarding.html?mode=edit");
+  });
+  document.getElementById("openProfile").addEventListener("click", () => {
+    closeProfileMenu();
+    setActivePage("Perfil");
   });
   document.addEventListener("click", event => {
     if (!event.target.closest(".profile-menu-wrap")) closeProfileMenu();
